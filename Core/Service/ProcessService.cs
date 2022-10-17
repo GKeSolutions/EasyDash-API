@@ -1,4 +1,5 @@
-﻿using Core.Interface;
+﻿using Core.Enum;
+using Core.Interface;
 using Core.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
@@ -17,15 +18,13 @@ namespace Core.Service
 
         public async Task<object> GetProcesses(int orderBy)
         {
-            var result =  await GetProcessesFromDb();
+            var processes = await GetProcessesFromDb();
             switch (orderBy)
             {
-                case 1:
-                    return GetItemsGroupedByUser(result);
-                case 2:
-                    return GetItemsGroupedByProcess(result);
+                case (int)ProcessGroupBy.GroupByUser:
+                    return GetProcessesGroupedByUser(processes);
                 default:
-                    return GetItemsGroupedByProcess(result);
+                    return GetProcessesGroupedByProcess(processes);
             }
         }
 
@@ -36,7 +35,7 @@ namespace Core.Service
             return await connection.QueryAsync<ProcessResult>("GetProcesses");
         }
 
-        private IEnumerable<User> GetItemsGroupedByUser(IEnumerable<ProcessResult> processes)
+        private IEnumerable<User> GetProcessesGroupedByUser(IEnumerable<ProcessResult> processes)
         {
             var grouped = processes.ToList()
                 .GroupBy(r => r.UserId)
@@ -50,21 +49,54 @@ namespace Core.Service
             return grouped;
         }
 
-        private IEnumerable<User> GetItemsGroupedByProcess(IEnumerable<ProcessResult> processes)
+        private IEnumerable<Process> GetProcessesGroupedByProcess(IEnumerable<ProcessResult> processes)
         {
             var grouped = processes.ToList()
-                .GroupBy(r => r.UserId)
-                .Select(g => new User
+                .GroupBy(r => r.ProcessCode)
+                .Select(g => new Process
                 {
-                    UserName = g.First().UserName,
-                    UserEmail = g.First().UserEmail,
-                    UserId = g.First().UserId,
-                    Processes = GetProcessesFromGroup(g)
-                });
+                    ProcessCode = g.First().ProcessCode,
+                    ProcessDescription = g.First().ProcessDescription,
+                    Users = GetUsersFromGroup(g)
+                }); ;
             return grouped;
         }
 
         private List<ProcessItem> GetProcessesFromGroup(IGrouping<Guid, ProcessResult> g)
+        {
+            var result = new List<ProcessItem>();
+            foreach (var x in g)
+            {
+                var pi = new ProcessItem
+                {
+                    LastUpdated = x.LastUpdated,
+                    ProcessCode = x.ProcessCode,
+                    ProcessDescription = x.ProcessDescription,
+                    ProcessItemId = x.ProcessItemId
+                };
+                result.Add(pi);
+            }
+            return result;
+        }
+
+        private List<User> GetUsersFromGroup(IGrouping<string, ProcessResult> g)
+        {
+            var result = new List<User>();
+            foreach (var x in g)
+            {
+                var user = new User
+                {
+                    UserId = x.UserId,
+                    UserName = x.UserName,
+                    UserEmail = x.UserEmail,
+                    Processes = GetProcessesFromGroup2(g)
+                };
+                result.Add(user);
+            }
+            return result;
+        }
+
+        private List<ProcessItem> GetProcessesFromGroup2(IGrouping<string, ProcessResult> g)
         {
             var result = new List<ProcessItem>();
             foreach (var x in g)

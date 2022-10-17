@@ -14,15 +14,9 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<object> Get(int orderBy)
+        public async Task<object> Get(int id)
         {
-            return await ProcessService.GetProcesses(orderBy);
-        }
-
-        [HttpGet]
-        public async Task<object> pp(int orderBy)
-        {
-            return await ProcessService.GetProcesses(orderBy);
+            return await ProcessService.GetProcesses(id);
         }
     }
 }
