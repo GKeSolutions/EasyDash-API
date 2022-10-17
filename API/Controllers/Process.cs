@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/{id?}")]
     public class Process : ControllerBase
     {
         private IProcessService ProcessService { get; set; }
@@ -14,9 +14,15 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<object> Get()
+        public async Task<object> Get(int orderBy)
         {
-            return await ProcessService.GetProcesses();
+            return await ProcessService.GetProcesses(orderBy);
+        }
+
+        [HttpGet]
+        public async Task<object> pp(int orderBy)
+        {
+            return await ProcessService.GetProcesses(orderBy);
         }
     }
 }
