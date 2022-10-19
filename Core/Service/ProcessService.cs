@@ -30,7 +30,7 @@ namespace Core.Service
 
         private async Task<IEnumerable<ProcessResult>> GetProcessesFromDb()
         {
-            var connection = new SqlConnection("Data Source=localhost;Initial Catalog=TE_3E_SANDBOX29;Integrated Security=true");
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<ProcessResult>("GetProcesses");
         }
@@ -89,7 +89,7 @@ namespace Core.Service
                     UserId = x.UserId,
                     UserName = x.UserName,
                     UserEmail = x.UserEmail,
-                    Processes = GetProcessesFromGroup2(g)
+                    //Processes = GetProcessesFromGroup2(g)
                 };
                 result.Add(user);
             }
