@@ -1,5 +1,5 @@
 ﻿using Core.Interface;
-using Core.Model;
+using Core.Model.Dashboard;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;

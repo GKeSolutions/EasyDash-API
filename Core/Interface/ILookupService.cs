@@ -1,4 +1,4 @@
-﻿using Core.Model;
+﻿using Core.Model.Dashboard;
 
 namespace Core.Interface
 {

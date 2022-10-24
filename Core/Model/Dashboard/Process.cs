@@ -1,4 +1,4 @@
-﻿namespace Core.Model
+﻿namespace Core.Model.Dashboard
 {
     public class Users
     {
