@@ -1,31 +1,43 @@
-﻿using Core.Enum;
-using Core.Interface;
+﻿using Core.Interface;
 using Core.Model;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace Core.Service
 {
-    public class ProcessService : IProcessService
+    public class DashboardService : IDashboardService
     {
         private IConfiguration Configuration;
 
-        public ProcessService(IConfiguration configuration)
+        public DashboardService(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public async Task<object> GetProcesses(int orderBy)
+        public async Task<IEnumerable<User>> GetUsers()
         {
             var processes = await GetProcessesFromDb();
-            switch (orderBy)
+            var grouped = GroupByUser(processes);
+            var distinctUsers = grouped.Select(x => x.UserId).Distinct();
+            var userRoles = await GetUserRoles(distinctUsers);
+            return MapUserToRoles(grouped.ToList(), userRoles);
+        }
+
+        public async Task<IEnumerable<Process>> GetProcesses()
+        {
+            var processes = await GetProcessesFromDb();
+            var grouped = GroupByProcess(processes);
+            var distinctUsers = processes.Select(x => x.UserId).Distinct();
+            var userRoles = await GetUserRoles(distinctUsers);
+            var processWithUsersAndRoles = new List<Process>();
+            foreach (var p in grouped)
             {
-                case (int)ProcessGroupBy.GroupByUser:
-                    return GetProcessesGroupedByUser(processes);
-                default:
-                    return GetProcessesGroupedByProcess(processes);
+                p.Users = MapUserToRoles(p.Users, userRoles).ToList();
+                processWithUsersAndRoles.Add(p);
             }
+            return processWithUsersAndRoles;
         }
 
         private async Task<IEnumerable<ProcessResult>> GetProcessesFromDb()
@@ -35,7 +47,7 @@ namespace Core.Service
             return await connection.QueryAsync<ProcessResult>("GetProcesses");
         }
 
-        private IEnumerable<User> GetProcessesGroupedByUser(IEnumerable<ProcessResult> processes)
+        private IEnumerable<User> GroupByUser(IEnumerable<ProcessResult> processes)
         {
             var grouped = processes.ToList()
                 .GroupBy(r => r.UserId)
@@ -49,7 +61,7 @@ namespace Core.Service
             return grouped;
         }
 
-        private IEnumerable<Process> GetProcessesGroupedByProcess(IEnumerable<ProcessResult> processes)
+        private IEnumerable<Process> GroupByProcess(IEnumerable<ProcessResult> processes)
         {
             var grouped = processes.ToList()
                 .GroupBy(r => r.ProcessCode)
@@ -89,28 +101,47 @@ namespace Core.Service
                     UserId = x.UserId,
                     UserName = x.UserName,
                     UserEmail = x.UserEmail,
-                    //Processes = GetProcessesFromGroup2(g)
                 };
                 result.Add(user);
             }
             return result;
         }
 
-        private List<ProcessItem> GetProcessesFromGroup2(IGrouping<string, ProcessResult> g)
+        private async Task<IEnumerable<UserRole>> GetUserRoles(IEnumerable<Guid> users)
         {
-            var result = new List<ProcessItem>();
-            foreach (var x in g)
+            var usersTbl = new DataTable();
+            usersTbl.Columns.Add("Id", typeof(Guid));
+            if (users != null)
             {
-                var pi = new ProcessItem
-                {
-                    LastUpdated = x.LastUpdated,
-                    ProcessCode = x.ProcessCode,
-                    ProcessDescription = x.ProcessDescription,
-                    ProcessItemId = x.ProcessItemId
-                };
-                result.Add(pi);
+                foreach (var id in users)
+                    usersTbl.Rows.Add(id);
             }
-            return result;
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                users = usersTbl.AsTableValuedParameter("IdListGui"),
+            });
+
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            return await connection.QueryAsync<UserRole>(sql: "GetUserRoles", param: dparam, commandType: CommandType.StoredProcedure);
+        }
+
+        private IEnumerable<User> MapUserToRoles(List<User> grouped, IEnumerable<UserRole> userRoles)
+        {
+            var updatedUsersWithRoles = new List<User>();
+            foreach (var u in grouped)
+            {
+                foreach (var g in userRoles)
+                {
+                    if(u.UserId == g.UserId)
+                    {
+                        u.Roles.Add(new Role { RoleId = g.RoleId, RoleName = g.RoleName });
+                    }
+                }
+                updatedUsersWithRoles.Add(u);
+            }
+            return updatedUsersWithRoles;
         }
     }
 }

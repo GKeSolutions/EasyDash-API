@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 //IServiceCollection services = new ServiceCollection();
 
 // Add services to the container.
-builder.Services.AddSingleton<IProcessService, ProcessService>();
+builder.Services.AddSingleton<IDashboardService, DashboardService>();
 builder.Services.AddSingleton<ILookupService, LookupService>();
 
 builder.Services.AddControllers();

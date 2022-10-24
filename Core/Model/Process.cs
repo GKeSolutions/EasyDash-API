@@ -11,6 +11,7 @@
         public string UserName { get; set; }
         public string UserEmail { get; set; }
         public List<ProcessItem> Processes { get; set; }
+        public List<Role> Roles { get; set; } = new List<Role>();
     }
 
     public class ProcessItem
