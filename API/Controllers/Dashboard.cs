@@ -1,5 +1,6 @@
 ﻿using Core.Interface;
-using Core.Model.Dashboard;
+using Core.Model.Dashboard.Process;
+using Core.Model.Dashboard.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers

@@ -1,8 +1,7 @@
-﻿namespace Core.Model.Dashboard
+﻿namespace Core.Model.Dashboard.Role
 {
-    public class UserRole
+    public class Role
     {
-        public Guid UserId { get; set; }
         public Guid RoleId { get; set; }
         public string RoleName { get; set; }
     }

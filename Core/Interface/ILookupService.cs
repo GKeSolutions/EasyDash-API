@@ -1,4 +1,4 @@
-﻿using Core.Model.Dashboard;
+﻿using Core.Model.Dashboard.Role;
 
 namespace Core.Interface
 {

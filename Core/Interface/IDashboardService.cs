@@ -1,4 +1,5 @@
-﻿using Core.Model.Dashboard;
+﻿using Core.Model.Dashboard.Process;
+using Core.Model.Dashboard.User;
 
 namespace Core.Interface
 {

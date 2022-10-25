@@ -1,5 +1,7 @@
 ﻿using Core.Interface;
-using Core.Model.Dashboard;
+using Core.Model.Dashboard.Process;
+using Core.Model.Dashboard.Role;
+using Core.Model.Dashboard.User;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using System.Data;
