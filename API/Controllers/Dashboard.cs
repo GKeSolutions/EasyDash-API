@@ -1,10 +1,12 @@
 ﻿using Core.Interface;
 using Core.Model.Dashboard.Process;
 using Core.Model.Dashboard.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]/[Action]")]
     public class Dashboard : ControllerBase
