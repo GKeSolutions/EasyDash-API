@@ -9,5 +9,6 @@
         public Guid ProcessItemId { get; set; }
         public string ProcessCode { get; set; }
         public string ProcessDescription { get; set; }
+        public string ProcessCaption { get; set; }
     }
 }

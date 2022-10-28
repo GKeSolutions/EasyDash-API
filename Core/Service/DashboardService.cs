@@ -71,6 +71,7 @@ namespace Core.Service
                 {
                     ProcessCode = g.First().ProcessCode,
                     ProcessDescription = g.First().ProcessDescription,
+                    ProcessCaption = g.First().ProcessCaption,
                     Users = GetUsersFromGroup(g)
                 }); ;
             return grouped;
@@ -86,7 +87,8 @@ namespace Core.Service
                     LastUpdated = x.LastUpdated,
                     ProcessCode = x.ProcessCode,
                     ProcessDescription = x.ProcessDescription,
-                    ProcessItemId = x.ProcessItemId
+                    ProcessItemId = x.ProcessItemId,
+                    ProcessCaption = x.ProcessCaption,
                 };
                 result.Add(pi);
             }

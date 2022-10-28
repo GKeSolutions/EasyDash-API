@@ -4,6 +4,7 @@ namespace Core.Interface
 {
     public interface IAnalyticsService
     {
-        Task<IEnumerable<UserAnalytic>> GetAnalytics();
+        Task<IEnumerable<UserAnalytic>> GetAnalyticUsers();
+        Task<IEnumerable<ProcessAnalytic>> GetAnalyticProcesses();
     }
 }

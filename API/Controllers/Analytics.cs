@@ -19,7 +19,13 @@ namespace EasyDash_API.Controllers
         [HttpGet]
         public async Task<IEnumerable<UserAnalytic>> user()
         {
-            return await AnalyticsService.GetAnalytics();
+            return await AnalyticsService.GetAnalyticUsers();
+        }
+
+        [HttpGet]
+        public async Task<IEnumerable<ProcessAnalytic>> process()
+        {
+            return await AnalyticsService.GetAnalyticProcesses();
         }
     }
 }

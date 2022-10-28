@@ -14,10 +14,16 @@ namespace Core.Service
         {
             Configuration = configuration;
         }
-        public async Task<IEnumerable<UserAnalytic>> GetAnalytics()
+        public async Task<IEnumerable<UserAnalytic>> GetAnalyticUsers()
         {
             var analyticsData = await GetAnalyticsFromDb();
             return GroupByUser(analyticsData);
+        }
+
+        public async Task<IEnumerable<ProcessAnalytic>> GetAnalyticProcesses()
+        {
+            var analyticsData = await GetAnalyticsFromDb();
+            return GroupByProcess(analyticsData);
         }
 
         private async Task<IEnumerable<Analytics>> GetAnalyticsFromDb()
@@ -29,7 +35,6 @@ namespace Core.Service
 
         private IEnumerable<UserAnalytic> GroupByUser(IEnumerable<Analytics> analytics)
         {
-            var test = analytics.ToList().GroupBy(r => r.UserId);
             var grouped = analytics.ToList()
                 .GroupBy(r => r.UserId)
                 .Select(g => new UserAnalytic
@@ -38,6 +43,19 @@ namespace Core.Service
                     UserName = g.First().UserName,
                     Processes = GetProcessesFromGroup(g)
                 });
+            return grouped;
+        }
+
+        private IEnumerable<ProcessAnalytic> GroupByProcess(IEnumerable<Analytics> analytics)
+        {
+            var grouped = analytics.ToList()
+                .GroupBy(r => r.ProcessCode)
+                .Select(g => new ProcessAnalytic
+                {
+                    ProcessCode = g.First().ProcessCode,
+                    ProcessName = g.First().ProcessName,
+                    Users = GetUsersFromGroup(g)
+                }); ;
             return grouped;
         }
 
@@ -50,9 +68,27 @@ namespace Core.Service
                 {
                     ProcessCode = x.ProcessCode,
                     ProcessName = x.ProcessName,
-                    AverageHours = x.AvgTimeSpentInMinutes
+                    AverageHours = Math.Round(TimeSpan.FromMinutes(x.AvgTimeSpentInMinutes).TotalHours, 2),
+                    TotalHours = Math.Round(TimeSpan.FromMinutes(x.TotalTimeSpentInMinutes).TotalHours, 2),
                 };
                 result.Add(pa);
+            }
+            return result;
+        }
+
+        private List<UserAnalytic> GetUsersFromGroup(IGrouping<string, Analytics> g)
+        {
+            var result = new List<UserAnalytic>();
+            foreach (var x in g)
+            {
+                var user = new UserAnalytic
+                {
+                    UserId = x.UserId,
+                    UserName = x.UserName,
+                    AverageHours = Math.Round(TimeSpan.FromMinutes(x.AvgTimeSpentInMinutes).TotalHours, 2),
+                    TotalHours = Math.Round(TimeSpan.FromMinutes(x.TotalTimeSpentInMinutes).TotalHours, 2),
+                };
+                result.Add(user);
             }
             return result;
         }
