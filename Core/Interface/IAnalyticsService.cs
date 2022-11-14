@@ -6,5 +6,7 @@ namespace Core.Interface
     {
         Task<IEnumerable<UserAnalytic>> GetAnalyticUsers();
         Task<IEnumerable<ProcessAnalytic>> GetAnalyticProcesses();
+        Task<IEnumerable<User>> GetAnalyticUserList();
+        Task<IEnumerable<Process>> GetAnalyticProcessList();
     }
 }

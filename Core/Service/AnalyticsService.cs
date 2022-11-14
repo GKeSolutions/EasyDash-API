@@ -26,11 +26,43 @@ namespace Core.Service
             return GroupByProcess(analyticsData);
         }
 
+        public async Task<IEnumerable<User>> GetAnalyticUserList()
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                StartDate= DateTime.Now.AddYears(-3),
+                EndDate= DateTime.Now,
+            });
+            return await connection.QueryAsync<User>("Analytics_UserList", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+        }
+
+        public async Task<IEnumerable<Process>> GetAnalyticProcessList()
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                StartDate = DateTime.Now.AddYears(-3),
+                EndDate = DateTime.Now,
+            });
+            return await connection.QueryAsync<Process>("Analytics_ProcessList", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+        }
+
         private async Task<IEnumerable<Analytics>> GetAnalyticsFromDb()
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
-            return await connection.QueryAsync<Analytics>("Analytics");
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                StartDate = DateTime.Now.AddYears(-3),
+                EndDate = DateTime.Now,
+            });
+            return await connection.QueryAsync<Analytics>("Analytics", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
 
         private IEnumerable<UserAnalytic> GroupByUser(IEnumerable<Analytics> analytics)
@@ -90,7 +122,7 @@ namespace Core.Service
                 };
                 result.Add(user);
             }
-            return result;
+            return result.OrderByDescending(x => x.AverageHours).ToList();
         }
     }
 }

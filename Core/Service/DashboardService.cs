@@ -105,6 +105,8 @@ namespace Core.Service
                     UserId = x.UserId,
                     UserName = x.UserName,
                     UserEmail = x.UserEmail,
+                    LastUpdated = x.LastUpdated
+                    
                 };
                 result.Add(user);
             }
