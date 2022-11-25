@@ -20,6 +20,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IDashboardService, DashboardService>();
 builder.Services.AddSingleton<ILookupService, LookupService>();
 builder.Services.AddSingleton<IAnalyticsService, AnalyticsService>();
+builder.Services.AddSingleton<INotificationService, NotificationService>();
 
 
 var app = builder.Build();
