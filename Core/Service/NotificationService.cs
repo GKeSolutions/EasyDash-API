@@ -20,6 +20,7 @@ namespace Core.Service
             return await connection.QueryAsync<Model.Notification.Type>("GeNotificationType");
         }
 
+        #region Template
         public async Task<IEnumerable<Template>> GetTemplate()
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
@@ -75,5 +76,62 @@ namespace Core.Service
             });
             return await connection.ExecuteAsync("DeleteTemplate", dparam);
         }
+        #endregion
+
+        #region Scheduler
+        public async Task<IEnumerable<Scheduler>> GetScheduler()
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            return await connection.QueryAsync<Scheduler>("GeNotificationScheduler");
+        }
+
+        public async Task<Scheduler> CreateScheduler(Scheduler scheduler)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                IsActive = scheduler.IsActive,
+                NotificationTemplate = scheduler.NotificationTemplate,
+                Priority = scheduler.Schedule,
+                Role = scheduler.NotifyAfterDays,
+                Process = scheduler.ReassignTo,
+                TemplateSubject = scheduler.CcContact
+            });
+            return await connection.ExecuteScalarAsync<Scheduler>("CreateScheduler", dparam);
+        }
+
+        public async Task<Scheduler> UpdateScheduler(Scheduler scheduler)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                Id = scheduler.Id,
+                IsActive = scheduler.IsActive,
+                NotificationTemplate = scheduler.NotificationTemplate,
+                Priority = scheduler.Schedule,
+                Role = scheduler.NotifyAfterDays,
+                Process = scheduler.ReassignTo,
+                TemplateSubject = scheduler.CcContact
+            });
+            return await connection.ExecuteScalarAsync<Scheduler>("UpdateScheduler", dparam);
+        }
+
+        public async Task<int> DeleteScheduler(int scheduler)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                Id = scheduler
+            });
+            return await connection.ExecuteAsync("DeleteScheduler", dparam);
+        }
+        #endregion
     }
 }
