@@ -1,7 +1,13 @@
-﻿namespace Core.Interface;
+﻿using Core.Model.Notification;
+
+namespace Core.Interface;
 
 public interface INotificationService
 {
-    List<Model.Notification.Type> Type();
+    Task<IEnumerable<Model.Notification.Type>> GetType();
+    Task<IEnumerable<Template>> GetTemplate();
+    Task<Template> CreateTemplate(Template template);
+    Task<Template> UpdateTemplate(Template template);
+    Task<int> DeleteTemplate(int template);
 }
 
