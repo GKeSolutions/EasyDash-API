@@ -17,7 +17,7 @@ namespace Core.Service
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
-            return await connection.QueryAsync<Model.Notification.Type>("GeNotificationType");
+            return await connection.QueryAsync<Model.Notification.Type>("ed.GeNotificationType");
         }
 
         #region Template
@@ -25,7 +25,7 @@ namespace Core.Service
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
-            return await connection.QueryAsync<Template>("GeNotificationTemplate");
+            return await connection.QueryAsync<Template>("ed.GeNotificationTemplate");
         }
 
         public async Task<Template> CreateTemplate(Template template)
@@ -37,13 +37,14 @@ namespace Core.Service
             {
                 IsActive = template.IsActive,
                 Description = template.Description,
+                Type = template.Type,
                 Priority = template.Priority,
                 Role = template.Role,
                 Process = template.Process,
                 TemplateSubject = template.TemplateSubject,
                 TemplateBody = template.TemplateBody
             });
-            return await connection.ExecuteScalarAsync<Template>("CreateTemplate", dparam);
+            return await connection.QueryFirstOrDefaultAsync<Template>("ed.CreateTemplate", param:dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
 
         public async Task<Template> UpdateTemplate(Template template)
@@ -56,13 +57,14 @@ namespace Core.Service
                 Id = template.Id,
                 IsActive = template.IsActive,
                 Description = template.Description,
+                Type = template.Type,
                 Priority = template.Priority,
                 Role = template.Role,
                 Process = template.Process,
                 TemplateSubject = template.TemplateSubject,
                 TemplateBody = template.TemplateBody
             });
-            return await connection.ExecuteScalarAsync<Template>("UpdateTemplate", dparam);
+            return await connection.QueryFirstOrDefaultAsync<Template>("ed.UpdateTemplate", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
 
         public async Task<int> DeleteTemplate(int template)
@@ -74,7 +76,7 @@ namespace Core.Service
             {
                 Id = template
             });
-            return await connection.ExecuteAsync("DeleteTemplate", dparam);
+            return await connection.ExecuteAsync("ed.DeleteTemplate", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
         #endregion
 
@@ -83,7 +85,7 @@ namespace Core.Service
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
-            return await connection.QueryAsync<Scheduler>("GeNotificationScheduler");
+            return await connection.QueryAsync<Scheduler>("ed.GeNotificationScheduler");
         }
 
         public async Task<Scheduler> CreateScheduler(Scheduler scheduler)
@@ -100,7 +102,7 @@ namespace Core.Service
                 Process = scheduler.ReassignTo,
                 TemplateSubject = scheduler.CcContact
             });
-            return await connection.ExecuteScalarAsync<Scheduler>("CreateScheduler", dparam);
+            return await connection.QueryFirstOrDefaultAsync<Scheduler>("ed.CreateScheduler", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
 
         public async Task<Scheduler> UpdateScheduler(Scheduler scheduler)
@@ -118,7 +120,7 @@ namespace Core.Service
                 Process = scheduler.ReassignTo,
                 TemplateSubject = scheduler.CcContact
             });
-            return await connection.ExecuteScalarAsync<Scheduler>("UpdateScheduler", dparam);
+            return await connection.QueryFirstOrDefaultAsync<Scheduler>("ed.UpdateScheduler", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
 
         public async Task<int> DeleteScheduler(int scheduler)
@@ -130,7 +132,7 @@ namespace Core.Service
             {
                 Id = scheduler
             });
-            return await connection.ExecuteAsync("DeleteScheduler", dparam);
+            return await connection.ExecuteAsync("ed.DeleteScheduler", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
         #endregion
     }

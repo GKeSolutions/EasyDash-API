@@ -41,9 +41,33 @@ namespace EasyDash_API.Controllers
         }
 
         [HttpDelete]
-        public async Task<int> DeleteTemplate([FromBody] int template)
+        public async Task<int> DeleteTemplate(int template)
         {
             return await NotificationService.DeleteTemplate(template);
+        }
+
+        [HttpGet]
+        public async Task<IEnumerable<Scheduler>> NotificationScheduler()
+        {
+            return await NotificationService.GetScheduler();
+        }
+
+        [HttpPost]
+        public async Task<Scheduler> CreateScheduler([FromBody] Scheduler scheduler)
+        {
+            return await NotificationService.CreateScheduler(scheduler);
+        }
+
+        [HttpPut]
+        public async Task<Scheduler> UpdateScheduler([FromBody] Scheduler scheduler)
+        {
+            return await NotificationService.UpdateScheduler(scheduler);
+        }
+
+        [HttpDelete]
+        public async Task<int> DeleteScheduler(int scheduler)
+        {
+            return await NotificationService.DeleteScheduler(scheduler);
         }
     }
 }
