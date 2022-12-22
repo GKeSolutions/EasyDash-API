@@ -19,7 +19,7 @@ namespace Core.Service
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
-            return await connection.QueryAsync<Role>("GetRoles");
+            return await connection.QueryAsync<Role>("ed.GetRoles");
         }
     }
 }

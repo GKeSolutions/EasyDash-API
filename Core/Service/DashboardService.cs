@@ -46,7 +46,7 @@ namespace Core.Service
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
-            return await connection.QueryAsync<ProcessResult>("GetProcesses");
+            return await connection.QueryAsync<ProcessResult>("ed.GetProcesses");
         }
 
         private IEnumerable<User> GroupByUser(IEnumerable<ProcessResult> processes)
@@ -125,12 +125,12 @@ namespace Core.Service
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
             {
-                users = usersTbl.AsTableValuedParameter("IdListGui"),
+                users = usersTbl.AsTableValuedParameter("ed.IdListGui"),
             });
 
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
-            return await connection.QueryAsync<UserRole>(sql: "GetUserRoles", param: dparam, commandType: CommandType.StoredProcedure);
+            return await connection.QueryAsync<UserRole>(sql: "ed.GetUserRoles", param: dparam, commandType: CommandType.StoredProcedure);
         }
 
         private IEnumerable<User> MapUserToRoles(List<User> grouped, IEnumerable<UserRole> userRoles)

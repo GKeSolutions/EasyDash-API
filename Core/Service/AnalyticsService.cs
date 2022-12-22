@@ -36,7 +36,7 @@ namespace Core.Service
                 StartDate= DateTime.Now.AddYears(-3),
                 EndDate= DateTime.Now,
             });
-            return await connection.QueryAsync<User>("Analytics_UserList", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            return await connection.QueryAsync<User>("ed.Analytics_UserList", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
 
         public async Task<IEnumerable<Process>> GetAnalyticProcessList()
@@ -49,7 +49,7 @@ namespace Core.Service
                 StartDate = DateTime.Now.AddYears(-3),
                 EndDate = DateTime.Now,
             });
-            return await connection.QueryAsync<Process>("Analytics_ProcessList", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            return await connection.QueryAsync<Process>("ed.Analytics_ProcessList", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
 
         private async Task<IEnumerable<Analytics>> GetAnalyticsFromDb()
@@ -62,7 +62,7 @@ namespace Core.Service
                 StartDate = DateTime.Now.AddYears(-3),
                 EndDate = DateTime.Now,
             });
-            return await connection.QueryAsync<Analytics>("Analytics", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            return await connection.QueryAsync<Analytics>("ed.Analytics", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
 
         private IEnumerable<UserAnalytic> GroupByUser(IEnumerable<Analytics> analytics)
