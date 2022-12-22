@@ -21,6 +21,7 @@ builder.Services.AddSingleton<IDashboardService, DashboardService>();
 builder.Services.AddSingleton<ILookupService, LookupService>();
 builder.Services.AddSingleton<IAnalyticsService, AnalyticsService>();
 builder.Services.AddSingleton<INotificationService, NotificationService>();
+builder.Services.AddSingleton<IMissingTimeService, MissingTimeService>();
 
 
 var app = builder.Build();
