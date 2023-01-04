@@ -13,5 +13,6 @@ public interface INotificationService
     Task<Scheduler> CreateScheduler(Scheduler scheduler);
     Task<Scheduler> UpdateScheduler(Scheduler scheduler);
     Task<int> DeleteScheduler(int scheduler);
+    Task<int> AddNotificationHistory(MessageHistory messageHistory);
 }
 

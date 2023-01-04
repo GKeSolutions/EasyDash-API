@@ -21,6 +21,7 @@ namespace Notification
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress("joe",_emailConfig.From));
             emailMessage.To.AddRange(message.To);
+            emailMessage.Cc.AddRange(message.Cc);
             emailMessage.Subject = message.Subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
             return emailMessage;

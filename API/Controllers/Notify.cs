@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Core.Interface;
+using Core.Model.Notification;
+using Microsoft.AspNetCore.Mvc;
 using Notification;
+using System.Text.Json;
 
 namespace EasyDash_API.Controllers
 {
@@ -8,19 +11,29 @@ namespace EasyDash_API.Controllers
     public class Notify : ControllerBase
     {
         private readonly IConfiguration Configuration;
-        public Notify(IConfiguration configuration)
+        private readonly INotificationService NotificationService;
+
+        public Notify(IConfiguration configuration, INotificationService notificationService)
         {
             Configuration = configuration;
+            NotificationService = notificationService;
         }
-        [HttpGet]
-        public bool Send()
+        [HttpPost]
+        public bool Send([FromBody] JsonElement payload)
         {
-            var rng = new Random();
-            var message = new Message(new string[] { "joe.doumit1@gmail.com" }, "Test email", "This is the content from our email.");
+            var message = new Message(new string[] { payload.GetProperty("To").ToString() }, new string[] { payload.GetProperty("To").ToString() }, payload.GetProperty("Subject").ToString(), payload.GetProperty("Content").ToString());
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();
             var emailSender = new EmailSender(emailConfig);
+            var messageHistory = new MessageHistory
+            {
+                To = string.Join(",", message.To.Select(x => x.Address)),
+                Cc = string.Join(",", message.Cc.Select(x => x.Address)),
+                Content = message.Content,
+                Subject = message.Subject
+            };
+            NotificationService.AddNotificationHistory(messageHistory);
             emailSender.SendEmail(message);
             return true;
         }

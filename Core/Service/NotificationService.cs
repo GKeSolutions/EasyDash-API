@@ -135,5 +135,21 @@ namespace Core.Service
             return await connection.ExecuteAsync("ed.DeleteScheduler", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
         #endregion
+
+        public async Task<int> AddNotificationHistory(MessageHistory message)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                To = message.To,
+                Cc = message.Cc,
+                Subject = message.Subject,
+                Content = message.Content
+            });
+            return await connection.ExecuteAsync("ed.AddNotificationHistory", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+
+        }
     }
 }
