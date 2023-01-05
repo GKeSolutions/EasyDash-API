@@ -9,5 +9,6 @@
         public DateTime WorkDate { get; set; }
         public decimal WeeklyHoursRequired { get; set; }
         public string Workcalendar { get; set; }
+        public string EmailAddress { get; set; }
     }
 }
