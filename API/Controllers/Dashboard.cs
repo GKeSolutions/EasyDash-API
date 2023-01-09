@@ -19,13 +19,13 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<User>> user()
+        public async Task<IEnumerable<Core.Model.Dashboard.User.DashUser>> user()
         {
             return await ProcessService.GetUsers();
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Process>> process()
+        public async Task<IEnumerable<DashProcess>> process()
         {
             return await ProcessService.GetProcesses();
         }

@@ -5,7 +5,7 @@ namespace Core.Interface
 {
     public interface IDashboardService
     {
-        Task<IEnumerable<User>> GetUsers();
-        Task<IEnumerable<Process>> GetProcesses();
+        Task<IEnumerable<DashUser>> GetUsers();
+        Task<IEnumerable<DashProcess>> GetProcesses();
     }
 }

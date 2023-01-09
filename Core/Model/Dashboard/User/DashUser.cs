@@ -2,7 +2,7 @@
 
 namespace Core.Model.Dashboard.User
 {
-    public class User
+    public class DashUser
     {
         public Guid UserId { get; set; }
         public string UserName { get; set; }

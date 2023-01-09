@@ -2,6 +2,6 @@
 {
     public class Users
     {
-        public List<User> User { get; set; }
+        public List<DashUser> User { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace Core.Service
             Configuration = configuration;
         }
 
-        public async Task<IEnumerable<User>> GetUsers()
+        public async Task<IEnumerable<DashUser>> GetUsers()
         {
             var processes = await GetProcessesFromDb();
             var grouped = GroupByUser(processes);
@@ -27,13 +27,13 @@ namespace Core.Service
             return MapUserToRoles(grouped.ToList(), userRoles);
         }
 
-        public async Task<IEnumerable<Process>> GetProcesses()
+        public async Task<IEnumerable<DashProcess>> GetProcesses()
         {
             var processes = await GetProcessesFromDb();
             var grouped = GroupByProcess(processes);
             var distinctUsers = processes.Select(x => x.UserId).Distinct();
             var userRoles = await GetUserRoles(distinctUsers);
-            var processWithUsersAndRoles = new List<Process>();
+            var processWithUsersAndRoles = new List<DashProcess>();
             foreach (var p in grouped)
             {
                 p.Users = MapUserToRoles(p.Users, userRoles).ToList();
@@ -49,11 +49,11 @@ namespace Core.Service
             return await connection.QueryAsync<ProcessResult>("ed.GetProcesses");
         }
 
-        private IEnumerable<User> GroupByUser(IEnumerable<ProcessResult> processes)
+        private IEnumerable<DashUser> GroupByUser(IEnumerable<ProcessResult> processes)
         {
             var grouped = processes.ToList()
                 .GroupBy(r => r.UserId)
-                .Select(g => new User
+                .Select(g => new DashUser
                 {
                     UserName = g.First().UserName,
                     UserEmail = g.First().UserEmail,
@@ -63,11 +63,11 @@ namespace Core.Service
             return grouped;
         }
 
-        private IEnumerable<Process> GroupByProcess(IEnumerable<ProcessResult> processes)
+        private IEnumerable<DashProcess> GroupByProcess(IEnumerable<ProcessResult> processes)
         {
             var grouped = processes.ToList()
                 .GroupBy(r => r.ProcessCode)
-                .Select(g => new Process
+                .Select(g => new DashProcess
                 {
                     ProcessCode = g.First().ProcessCode,
                     ProcessDescription = g.First().ProcessDescription,
@@ -95,12 +95,12 @@ namespace Core.Service
             return result;
         }
 
-        private List<User> GetUsersFromGroup(IGrouping<string, ProcessResult> g)
+        private List<DashUser> GetUsersFromGroup(IGrouping<string, ProcessResult> g)
         {
-            var result = new List<User>();
+            var result = new List<DashUser>();
             foreach (var x in g)
             {
-                var user = new User
+                var user = new DashUser
                 {
                     UserId = x.UserId,
                     UserName = x.UserName,
@@ -133,9 +133,9 @@ namespace Core.Service
             return await connection.QueryAsync<UserRole>(sql: "ed.GetUserRoles", param: dparam, commandType: CommandType.StoredProcedure);
         }
 
-        private IEnumerable<User> MapUserToRoles(List<User> grouped, IEnumerable<UserRole> userRoles)
+        private IEnumerable<DashUser> MapUserToRoles(List<DashUser> grouped, IEnumerable<UserRole> userRoles)
         {
-            var updatedUsersWithRoles = new List<User>();
+            var updatedUsersWithRoles = new List<DashUser>();
             foreach (var u in grouped)
             {
                 foreach (var g in userRoles)
