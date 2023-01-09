@@ -2,7 +2,6 @@
 using Core.Model.Notification;
 using Microsoft.AspNetCore.Mvc;
 using Notification;
-using System.Text.Json;
 
 namespace EasyDash_API.Controllers
 {
@@ -19,9 +18,10 @@ namespace EasyDash_API.Controllers
             NotificationService = notificationService;
         }
         [HttpPost]
-        public bool Send([FromBody] JsonElement payload)
+        public async Task<bool> Send([FromBody] EmailNotification emailNotification)
         {
-            var message = new Message(new string[] { payload.GetProperty("To").ToString() }, new string[] { payload.GetProperty("To").ToString() }, payload.GetProperty("Subject").ToString(), payload.GetProperty("Content").ToString());
+            var info = await NotificationService.GetNotificationInfo(emailNotification.UserId);
+            var message = new Message(new string[] { emailNotification.EmailAddress }, null, info.TemplateSubject, info.TemplateBody);
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();
@@ -33,8 +33,9 @@ namespace EasyDash_API.Controllers
                 Content = message.Content,
                 Subject = message.Subject
             };
-            NotificationService.AddNotificationHistory(messageHistory);
+            await NotificationService.AddNotificationHistory(messageHistory);
             emailSender.SendEmail(message);
+
             return true;
         }
     }

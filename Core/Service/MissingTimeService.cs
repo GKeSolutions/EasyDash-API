@@ -21,7 +21,7 @@ namespace Core.Service
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
             {
-                StartDate = DateTime.Now.AddYears(-10),
+                StartDate = DateTime.Now.AddMonths(-3),
                 EndDate = DateTime.Now,
             });
             return await connection.QueryAsync<Time>("ed.GetMissingTime", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
