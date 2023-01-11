@@ -136,14 +136,16 @@ namespace Core.Service
         }
         #endregion
 
-        public async Task<NotificationInfo> GetNotificationInfo(Guid UserId)
+        public async Task<NotificationInfo> GetNotificationInfo(EmailNotification notification)
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
             {
-                UserId = UserId
+                UserId = notification.UserId,
+                Process = notification.Process,
+                EventType=notification.EventType
             });
             return await connection.QueryFirstOrDefaultAsync<NotificationInfo>("ed.GetUserNotificationTemplate", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }

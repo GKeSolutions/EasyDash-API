@@ -13,7 +13,7 @@ public interface INotificationService
     Task<Scheduler> CreateScheduler(Scheduler scheduler);
     Task<Scheduler> UpdateScheduler(Scheduler scheduler);
     Task<int> DeleteScheduler(int scheduler);
-    Task<NotificationInfo> GetNotificationInfo(Guid UserId);
+    Task<NotificationInfo> GetNotificationInfo(EmailNotification notification);
     Task<int> AddNotificationHistory(MessageHistory messageHistory);
 }
 

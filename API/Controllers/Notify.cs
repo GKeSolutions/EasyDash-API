@@ -20,7 +20,7 @@ namespace EasyDash_API.Controllers
         [HttpPost]
         public async Task<bool> Send([FromBody] EmailNotification emailNotification)
         {
-            var info = await NotificationService.GetNotificationInfo(emailNotification.UserId);
+            var info = await NotificationService.GetNotificationInfo(emailNotification);
             var message = new Message(new string[] { emailNotification.EmailAddress }, null, info.TemplateSubject, info.TemplateBody);
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
