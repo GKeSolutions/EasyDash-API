@@ -22,7 +22,7 @@ namespace EasyDash_API.Controllers
         {
             var info = await NotificationService.GetNotificationInfo(emailNotification);
             if (info is null) return false;
-            var message = new Message(new string[] { emailNotification.EmailAddress }, null, info.TemplateSubject, info.TemplateBody);
+            var message = new Message(new string[] { emailNotification.EmailAddress }, new string[] { emailNotification.EmailAddress }, info.TemplateSubject, info.TemplateBody);
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();
