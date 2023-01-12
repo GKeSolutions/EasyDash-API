@@ -5,6 +5,7 @@ using Core.Model.MissingTime;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
+using System.Net.Mail;
 
 namespace Core.Service
 {
@@ -38,6 +39,8 @@ namespace Core.Service
                 {
                     Name = g.First().UserName,
                     Expected = g.First().WeeklyHoursRequired,
+                    EmailAddress = g.First().EmailAddress,
+                    UserId = g.First().UserId,
                     Days = BuildDays(g)
                 });
         }

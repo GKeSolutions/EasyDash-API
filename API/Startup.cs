@@ -22,6 +22,7 @@ namespace EasyDash_API
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
             });
 
             services.AddEndpointsApiExplorer();
