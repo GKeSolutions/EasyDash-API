@@ -15,9 +15,9 @@ namespace EasyDash_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Time>> Get()
+        public async Task<IEnumerable<Core.Model.MissingTime.MissingTime>> Get(DateTime startDate, DateTime endDate)
         {
-            return await MissingTimeService.GetMissingTime();
+            return await MissingTimeService.GetMissingTime(startDate, endDate);
         }
     }
 }

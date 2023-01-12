@@ -4,6 +4,6 @@ namespace Core.Interface;
 
 public interface IMissingTimeService
 {
-    Task<IEnumerable<Time>> GetMissingTime();
+    Task<IEnumerable<MissingTime>> GetMissingTime(DateTime startDate, DateTime endDate);
 }
 
