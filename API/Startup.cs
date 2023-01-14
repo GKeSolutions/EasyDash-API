@@ -1,5 +1,7 @@
 ﻿using Core.Interface;
 using Core.Service;
+using Hangfire;
+using Hangfire.SqlServer;
 using Notification;
 using System.Text.Json.Serialization;
 
@@ -40,9 +42,23 @@ namespace EasyDash_API
             services.AddSingleton<IAnalyticsService, AnalyticsService>();
             services.AddSingleton<INotificationService, NotificationService>();
             services.AddSingleton<IMissingTimeService, MissingTimeService>();
+
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(Configuration.GetConnectionString("HangfireConnection"), new SqlServerStorageOptions
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    UseRecommendedIsolationLevel = true,
+                    DisableGlobalLocks = true
+                }));
+            services.AddHangfireServer();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IBackgroundJobClient backgroundJobs, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -59,7 +75,8 @@ namespace EasyDash_API
             {
                 endpoints.MapControllers();
             });
-
+            app.UseHangfireDashboard();
+            backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
         }
     }
 }

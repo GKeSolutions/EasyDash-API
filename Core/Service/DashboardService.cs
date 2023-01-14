@@ -23,7 +23,7 @@ namespace Core.Service
             var processes = await GetProcessesFromDb();
             var grouped = GroupByUser(processes);
             var distinctUsers = grouped.Select(x => x.UserId).Distinct();
-            var userRoles = await GetUserRoles(distinctUsers);
+            var userRoles = await GetUsersRoles(distinctUsers);
             return MapUserToRoles(grouped.ToList(), userRoles);
         }
 
@@ -32,7 +32,7 @@ namespace Core.Service
             var processes = await GetProcessesFromDb();
             var grouped = GroupByProcess(processes);
             var distinctUsers = processes.Select(x => x.UserId).Distinct();
-            var userRoles = await GetUserRoles(distinctUsers);
+            var userRoles = await GetUsersRoles(distinctUsers);
             var processWithUsersAndRoles = new List<DashProcess>();
             foreach (var p in grouped)
             {
@@ -113,7 +113,7 @@ namespace Core.Service
             return result;
         }
 
-        private async Task<IEnumerable<UserRole>> GetUserRoles(IEnumerable<Guid> users)
+        private async Task<IEnumerable<UserRole>> GetUsersRoles(IEnumerable<Guid> users)
         {
             var usersTbl = new DataTable();
             usersTbl.Columns.Add("Id", typeof(Guid));
@@ -130,7 +130,7 @@ namespace Core.Service
 
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
-            return await connection.QueryAsync<UserRole>(sql: "ed.GetUserRoles", param: dparam, commandType: CommandType.StoredProcedure);
+            return await connection.QueryAsync<UserRole>(sql: "ed.GetUsersRoles", param: dparam, commandType: CommandType.StoredProcedure);
         }
 
         private IEnumerable<DashUser> MapUserToRoles(List<DashUser> grouped, IEnumerable<UserRole> userRoles)
