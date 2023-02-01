@@ -46,6 +46,33 @@ namespace EasyDash_API.Controllers
             return await NotificationService.DeleteTemplate(template);
         }
 
+        #region ScheduledNotification
+        [HttpGet]
+        public async Task<IEnumerable<ScheduledNotification>> GetScheduledNotification()
+        {
+            return await NotificationService.GetScheduledNotification();
+        }
+
+        [HttpPost]
+        public async Task<ScheduledNotification> CreateScheduledNotification([FromBody] ScheduledNotification scheduledNotification)
+        {
+            return await NotificationService.CreateScheduledNotification(scheduledNotification);
+        }
+
+        [HttpPut]
+        public async Task<ScheduledNotification> UpdateScheduledNotification([FromBody] ScheduledNotification scheduledNotification)
+        {
+            return await NotificationService.UpdateScheduledNotification(scheduledNotification);
+        }
+
+        [HttpDelete]
+        public async Task<int> DeleteScheduledNotification(int scheduledNotification)
+        {
+            return await NotificationService.DeleteScheduledNotification(scheduledNotification);
+        }
+        #endregion
+
+        #region Scheduler
         [HttpGet]
         public async Task<IEnumerable<Scheduler>> GetScheduler()
         {
@@ -69,5 +96,6 @@ namespace EasyDash_API.Controllers
         {
             return await NotificationService.DeleteScheduler(scheduler);
         }
+        #endregion
     }
 }

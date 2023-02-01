@@ -97,10 +97,10 @@ namespace Core.Service
             {
                 IsActive = scheduledNotification.IsActive,
                 NotificationTemplate = scheduledNotification.NotificationTemplate,
-                Priority = scheduledNotification.Scheduler,
-                Role = scheduledNotification.NotifyAfterDays,
-                Process = scheduledNotification.ReassignTo,
-                TemplateSubject = scheduledNotification.CcContact
+                Scheduler = scheduledNotification.Scheduler,
+                NotifyAfterDays = scheduledNotification.NotifyAfterDays,
+                ReassignTo = scheduledNotification.ReassignTo,
+                CcContact = scheduledNotification.CcContact
             });
             return await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.CreateScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
