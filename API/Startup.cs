@@ -17,6 +17,7 @@ namespace EasyDash_API
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();
@@ -24,7 +25,7 @@ namespace EasyDash_API
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-                options.JsonSerializerOptions.PropertyNamingPolicy = null;
+                //options.JsonSerializerOptions.PropertyNamingPolicy = null;
             });
 
             services.AddEndpointsApiExplorer();
@@ -65,7 +66,7 @@ namespace EasyDash_API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
@@ -76,7 +77,7 @@ namespace EasyDash_API
                 endpoints.MapControllers();
             });
             app.UseHangfireDashboard();
-            backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
+            //backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
         }
     }
 }

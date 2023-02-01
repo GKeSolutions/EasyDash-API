@@ -47,7 +47,7 @@ namespace EasyDash_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Scheduler>> NotificationScheduler()
+        public async Task<IEnumerable<Scheduler>> GetScheduler()
         {
             return await NotificationService.GetScheduler();
         }
