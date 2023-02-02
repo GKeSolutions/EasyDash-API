@@ -1,7 +1,6 @@
 ﻿using Core.Interface;
 using Core.Model.Notification;
 using Microsoft.AspNetCore.Mvc;
-using Notification;
 
 namespace EasyDash_API.Controllers
 {
@@ -20,24 +19,7 @@ namespace EasyDash_API.Controllers
         [HttpPost]
         public async Task<bool> Send([FromBody] EmailNotification emailNotification)
         {
-            var info = await NotificationService.GetNotificationInfo(emailNotification);
-            if (info is null) return false;
-            var message = new Message(new string[] { emailNotification.EmailAddress }, new string[] { emailNotification.EmailAddress }, info.TemplateSubject, info.TemplateBody);
-            var emailConfig = Configuration
-                .GetSection("EmailConfiguration")
-                .Get<EmailConfiguration>();
-            var emailSender = new EmailSender(emailConfig);
-            var messageHistory = new MessageHistory
-            {
-                To = string.Join(",", message.To.Select(x => x.Address)),
-                Cc = string.Join(",", message.Cc.Select(x => x.Address)),
-                Content = message.Content,
-                Subject = message.Subject
-            };
-            await NotificationService.AddNotificationHistory(messageHistory);
-            emailSender.SendEmail(message);
-
-            return true;
+            return await NotificationService.SendEmailNotification(emailNotification);
         }
     }
 }

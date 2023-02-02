@@ -2,6 +2,7 @@
 using Core.Model.Notification;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Notification;
 using System.Data.SqlClient;
 
 namespace Core.Service
@@ -211,6 +212,28 @@ namespace Core.Service
             });
             return await connection.ExecuteAsync("ed.AddNotificationHistory", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
 
+        }
+
+        public async Task<bool> SendEmailNotification(EmailNotification emailNotification)
+        {
+            var info = await GetNotificationInfo(emailNotification);
+            if (info is null) return false;
+            var message = new Message(new string[] { emailNotification.EmailAddress }, new string[] { emailNotification.EmailAddress }, info.TemplateSubject, info.TemplateBody);
+            var emailConfig = Configuration
+                .GetSection("EmailConfiguration")
+                .Get<EmailConfiguration>();
+            var emailSender = new EmailSender(emailConfig);
+            var messageHistory = new MessageHistory
+            {
+                To = string.Join(",", message.To.Select(x => x.Address)),
+                Cc = string.Join(",", message.Cc.Select(x => x.Address)),
+                Content = message.Content,
+                Subject = message.Subject
+            };
+            await AddNotificationHistory(messageHistory);
+            emailSender.SendEmail(message);
+
+            return true;
         }
     }
 }

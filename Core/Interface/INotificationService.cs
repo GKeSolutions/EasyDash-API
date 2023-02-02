@@ -9,15 +9,8 @@ public interface INotificationService
     Task<Template> CreateTemplate(Template template);
     Task<Template> UpdateTemplate(Template template);
     Task<int> DeleteTemplate(int template);
-    Task<IEnumerable<ScheduledNotification>> GetScheduledNotification();
-    Task<ScheduledNotification> CreateScheduledNotification(ScheduledNotification scheduler);
-    Task<ScheduledNotification> UpdateScheduledNotification(ScheduledNotification scheduler);
-    Task<int> DeleteScheduledNotification(int scheduler);
-    Task<IEnumerable<Scheduler>> GetScheduler();
-    Task<Scheduler> CreateScheduler(Scheduler scheduler);
-    Task<Scheduler> UpdateScheduler(Scheduler scheduler);
-    Task<int> DeleteScheduler(int scheduler);
     Task<NotificationInfo> GetNotificationInfo(EmailNotification notification);
     Task<int> AddNotificationHistory(MessageHistory messageHistory);
+    Task<bool> SendEmailNotification(EmailNotification emailNotification);
 }
 

@@ -1,11 +1,8 @@
 ﻿using Core.Interface;
-using Core.Model.Dashboard.Process;
-using Core.Model.Dashboard.User;
 using Core.Model.MissingTime;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
-using System.Net.Mail;
 
 namespace Core.Service
 {
