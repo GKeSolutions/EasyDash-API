@@ -192,7 +192,7 @@ namespace Core.Service
             dparam.AddDynamicParams(new
             {
                 UserId = notification.UserId,
-                Process = notification.Process,
+                Process = notification.ProcessCode,
                 EventType=notification.EventType
             });
             return await connection.QueryFirstOrDefaultAsync<NotificationInfo>("ed.GetUserNotificationTemplate", param: dparam, commandType: System.Data.CommandType.StoredProcedure);

@@ -24,18 +24,22 @@ namespace EasyDash_API.Controllers
         public async Task<SchedulerModel> CreateScheduler([FromBody] SchedulerModel scheduler)
         {
             return await SchedulerService.CreateScheduler(scheduler);
+            //Add Hangfire Job?
         }
 
         [HttpPut]
         public async Task<SchedulerModel> UpdateScheduler([FromBody] SchedulerModel scheduler)
         {
             return await SchedulerService.UpdateScheduler(scheduler);
+            //Update Hangfire Job?
         }
 
         [HttpDelete]
         public async Task<int> DeleteScheduler(int scheduler)
         {
             return await SchedulerService.DeleteScheduler(scheduler);
+            //Should be able to delete if it has an active scheduled notification?
+            //Add Hangfire Job?
         }
     }
 }

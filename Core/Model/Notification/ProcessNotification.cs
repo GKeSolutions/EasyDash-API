@@ -1,10 +1,9 @@
 ﻿namespace Core.Model.Notification
 {
-    public class EmailNotification
+    public class ProcessNotification
     {
         public Guid UserId { get; set; }
         public string EmailAddress { get; set; }
         public string ProcessCode { get; set; }
-        public string EventType { get; set; }
     }
 }

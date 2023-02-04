@@ -7,5 +7,8 @@ namespace Core.Interface
     {
         Task<IEnumerable<DashUser>> GetUsers();
         Task<IEnumerable<DashProcess>> GetProcesses();
+        Task<IEnumerable<DashProcess>> GetProcessesByUser(Guid userId);
+        Task<IEnumerable<DashUser>> GetUsersByProcess(string processCode);
+        //Task<IEnumerable<string>> GetActionListUsersToNotify();
     }
 }

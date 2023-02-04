@@ -28,6 +28,35 @@ namespace Core.Service
             return GroupByUser(result);
         }
 
+        public async Task<Time> GetMissingTimePerUserPerWeek(Guid userId, DateTime startDate, DateTime endDate)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                UserId = userId,
+                StartDate = startDate,
+                EndDate = endDate,
+            });
+            var result = await connection.QueryFirstAsync<Time>("ed.GetMissingTimePerUserPerWeek", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            return result;
+        }
+
+        public async Task<IEnumerable<Time>> GetUsersWithMissingTimePerWeek(DateTime startDate, DateTime endDate)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+            });
+            var result = await connection.QueryAsync<Time>("ed.GetUsersWithMissingTimePerWeek", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            return result;
+        }
+
         private IEnumerable<MissingTime> GroupByUser(IEnumerable<Time> times)
         {
             return times.ToList()

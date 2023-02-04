@@ -27,6 +27,15 @@ namespace Core.Service
             return MapUserToRoles(grouped.ToList(), userRoles);
         }
 
+        public async Task<IEnumerable<DashUser>> GetUsersByProcess(string processCode)
+        {
+            var processes = await GetUsersByProcessFromDb(processCode);
+            var grouped = GroupByUser(processes);
+            var distinctUsers = grouped.Select(x => x.UserId).Distinct();
+            var userRoles = await GetUsersRoles(distinctUsers);
+            return MapUserToRoles(grouped.ToList(), userRoles);
+        }
+
         public async Task<IEnumerable<DashProcess>> GetProcesses()
         {
             var processes = await GetProcessesFromDb();
@@ -42,11 +51,57 @@ namespace Core.Service
             return processWithUsersAndRoles;
         }
 
+        public async Task<IEnumerable<DashProcess>> GetProcessesByUser(Guid userId)
+        {
+            var processes = await GetProcessesByUserFromDb(userId);
+            var grouped = GroupByProcess(processes);
+            var distinctUsers = processes.Select(x => x.UserId).Distinct();
+            var userRoles = await GetUsersRoles(distinctUsers);
+            var processWithUsersAndRoles = new List<DashProcess>();
+            foreach (var p in grouped)
+            {
+                p.Users = MapUserToRoles(p.Users, userRoles).ToList();
+                processWithUsersAndRoles.Add(p);
+            }
+            return processWithUsersAndRoles;
+        }
+
+        //public async Task<IEnumerable<string>> GetActionListUsersToNotify()
+        //{
+        //    var processes = await GetProcessesFromDb();
+        //    var grouped = GroupByProcess(processes);
+        //    return processes.Select(x => x.UserEmail).Distinct();
+        //}
+
         private async Task<IEnumerable<ProcessResult>> GetProcessesFromDb()
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<ProcessResult>("ed.GetProcesses");
+        }
+
+        private async Task<IEnumerable<ProcessResult>> GetProcessesByUserFromDb(Guid userId)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                userId
+            });
+            return await connection.QueryAsync<ProcessResult>("ed.GetOpenProcessesByUser", param: dparam, commandType: CommandType.StoredProcedure);
+        }
+
+        private async Task<IEnumerable<ProcessResult>> GetUsersByProcessFromDb(string processCode)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                processCode
+            });
+            return await connection.QueryAsync<ProcessResult>("ed.GetUsersByProcess", param: dparam, commandType: CommandType.StoredProcedure);
         }
 
         private IEnumerable<DashUser> GroupByUser(IEnumerable<ProcessResult> processes)

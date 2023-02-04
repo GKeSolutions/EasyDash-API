@@ -42,7 +42,10 @@ namespace EasyDash_API
             services.AddSingleton<ILookupService, LookupService>();
             services.AddSingleton<IAnalyticsService, AnalyticsService>();
             services.AddSingleton<INotificationService, NotificationService>();
+            services.AddSingleton<IScheduledNotificationService, ScheduledNotificationService>();
+            services.AddSingleton<ISchedulerService, SchedulerService>();
             services.AddSingleton<IMissingTimeService, MissingTimeService>();
+            services.AddSingleton<IJobService, JobService>();
 
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
