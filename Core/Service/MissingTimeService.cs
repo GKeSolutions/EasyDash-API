@@ -28,7 +28,7 @@ namespace Core.Service
             return GroupByUser(result);
         }
 
-        public async Task<Time> GetMissingTimePerUserPerWeek(Guid userId, DateTime startDate, DateTime endDate)
+        public async Task<Time> GetTimePerUserPerWeek(Guid userId, DateTime startDate, DateTime endDate)
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
@@ -39,11 +39,11 @@ namespace Core.Service
                 StartDate = startDate,
                 EndDate = endDate,
             });
-            var result = await connection.QueryFirstAsync<Time>("ed.GetMissingTimePerUserPerWeek", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            var result = await connection.QueryFirstAsync<Time>("ed.GetTimePerUserPerWeek", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
             return result;
         }
 
-        public async Task<IEnumerable<Time>> GetUsersWithMissingTimePerWeek(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<Time>> GetUsersTimePerWeek(DateTime startDate, DateTime endDate)
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
@@ -54,6 +54,21 @@ namespace Core.Service
                 EndDate = endDate,
             });
             var result = await connection.QueryAsync<Time>("ed.GetUsersWithMissingTimePerWeek", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            return result;
+        }
+
+        public async Task<IEnumerable<Time>> GetWeeksTimePerUser(Guid userId, DateTime startDate, DateTime endDate)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                UserId = userId,
+                StartDate = startDate,
+                EndDate = endDate,
+            });
+            var result = await connection.QueryAsync<Time>("ed.GetWeeksTimePerUser", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
             return result;
         }
 
