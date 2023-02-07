@@ -31,6 +31,8 @@ namespace EasyDash_API.Controllers
         public async Task<SchedulerModel> UpdateScheduler([FromBody] SchedulerModel scheduler)
         {
             return await SchedulerService.UpdateScheduler(scheduler);
+            //Check if it is linked to a ScheduledNotification
+            //if yes, delete and recreate the job
             //Update Hangfire Job?
         }
 

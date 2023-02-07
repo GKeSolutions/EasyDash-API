@@ -218,7 +218,7 @@ namespace Core.Service
         {
             var info = await GetNotificationInfo(emailNotification);
             if (info is null) return false;
-            var message = new Message(new string[] { emailNotification.EmailAddress }, new string[] { emailNotification.EmailAddress }, info.TemplateSubject, info.TemplateBody);
+            var message = new Message(new string[] { emailNotification.EmailAddress }, new string[] { emailNotification.CcContact }, info.TemplateSubject, info.TemplateBody);
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();
@@ -226,9 +226,10 @@ namespace Core.Service
             var messageHistory = new MessageHistory
             {
                 To = string.Join(",", message.To.Select(x => x.Address)),
-                Cc = string.Join(",", message.Cc.Select(x => x.Address)),
+                Cc = message.To.Select(x => x.Address).First(),
                 Content = message.Content,
-                Subject = message.Subject
+                Subject = message.Subject,
+
             };
             await AddNotificationHistory(messageHistory);
             emailSender.SendEmail(message);

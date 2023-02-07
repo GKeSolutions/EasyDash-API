@@ -9,9 +9,12 @@ namespace Core.Service
     public class ScheduledNotificationService : IScheduledNotificationService
     {
         private IConfiguration Configuration;
-        public ScheduledNotificationService(IConfiguration configuration)
+        private IJobService JobService;
+
+        public ScheduledNotificationService(IConfiguration configuration, IJobService jobService)
         {
             Configuration = configuration;
+            JobService = jobService;
         }
 
         #region ScheduledNotification
@@ -36,7 +39,9 @@ namespace Core.Service
                 ReassignTo = scheduledNotification.ReassignTo,
                 CcContact = scheduledNotification.CcContact
             });
-            return await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.CreateScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            var result = await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.CreateScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            await JobService.AddJob(result.Id.ToString(), scheduledNotification.CronExpression);
+            return result;
         }
 
         public async Task<ScheduledNotification> UpdateScheduledNotification(ScheduledNotification scheduledNotification)
@@ -54,7 +59,10 @@ namespace Core.Service
                 Process = scheduledNotification.ReassignTo,
                 TemplateSubject = scheduledNotification.CcContact
             });
-            return await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.UpdateScheduler", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            var result = await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.UpdateScheduler", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            await JobService.DeleteJob(scheduledNotification.Id.ToString());
+            await JobService.AddJob(scheduledNotification.Id.ToString(), scheduledNotification.CronExpression);
+            return result;
         }
 
         public async Task<int> DeleteScheduledNotification(int scheduledNotification)

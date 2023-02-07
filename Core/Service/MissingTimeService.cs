@@ -72,6 +72,32 @@ namespace Core.Service
             return result;
         }
 
+        public async Task<IEnumerable<Time>> GetMissingTimeUsersPerTemplate(int templateId)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                TemplateId= templateId,
+            });
+            var result = await connection.QueryAsync<Time>("ed.GetMissingTimeUsersPerTemplate", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            return result;
+        }
+
+        public async Task<string> GetCcContactEmailAddress(Guid ccContact)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                ccContact = ccContact,
+            });
+            var result = await connection.QueryFirstOrDefaultAsync<string>("ed.GetCcContactEmailAddress", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            return result;
+        }
+
         private IEnumerable<MissingTime> GroupByUser(IEnumerable<Time> times)
         {
             return times.ToList()
