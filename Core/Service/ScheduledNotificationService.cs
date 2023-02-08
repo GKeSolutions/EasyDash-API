@@ -40,7 +40,7 @@ namespace Core.Service
                 CcContact = scheduledNotification.CcContact
             });
             var result = await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.CreateScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
-            await JobService.AddJob(result.Id.ToString(), scheduledNotification.CronExpression);
+            JobService.AddJob(scheduledNotification);
             return result;
         }
 
@@ -60,8 +60,8 @@ namespace Core.Service
                 TemplateSubject = scheduledNotification.CcContact
             });
             var result = await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.UpdateScheduler", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
-            await JobService.DeleteJob(scheduledNotification.Id.ToString());
-            await JobService.AddJob(scheduledNotification.Id.ToString(), scheduledNotification.CronExpression);
+            JobService.DeleteJob(scheduledNotification.Id.ToString());
+            JobService.AddJob(scheduledNotification);
             return result;
         }
 
