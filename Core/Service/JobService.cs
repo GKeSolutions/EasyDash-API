@@ -9,9 +9,12 @@ namespace Core.Service
     {
         private IMissingTimeService MissingTimeService;
         private INotificationService NotificationService;
-        public JobService(IMissingTimeService missingTimeService, INotificationService notificationService) 
+        private IDashboardService DashboardService;
+
+        public JobService(IMissingTimeService missingTimeService, INotificationService notificationService, IDashboardService dashboardService) 
         {
             MissingTimeService = missingTimeService;
+            DashboardService= dashboardService;
         }
         public bool AddJob(ScheduledNotification scheduledNotification)
         {
@@ -28,16 +31,24 @@ namespace Core.Service
             return true;
         }
 
-        private string SendEmailActionList(ScheduledNotification scheduledNotification)
+        public async Task<string> SendEmailActionList(ScheduledNotification scheduledNotification)
         {
+            var users = await DashboardService.GetOpenProcessesPerTemplate(scheduledNotification.NotificationTemplate);
+            foreach (var user in users)
+            {
+                var emailNotification = new EmailNotification
+                {
+                    EmailAddress = user.UserEmail,
+                    CcContact = await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact)
+                };
+                await NotificationService.SendEmailNotification(emailNotification);
+            }
+
             return string.Empty;
         }
 
         private async Task<string> SendEmailMissingTime(ScheduledNotification scheduledNotification)
         {
-            //Check if missing during last week and send them email
-            //for this template id, get the role, and for this role we get the users
-            //GetMissingTimeUsersPerTemplate
             var users = await MissingTimeService.GetMissingTimeUsersPerTemplate(scheduledNotification.NotificationTemplate);
             foreach (var user in users)
             {
@@ -48,7 +59,6 @@ namespace Core.Service
                 };
                 await NotificationService.SendEmailNotification(emailNotification);
             }
-
 
             return string.Empty;
         }

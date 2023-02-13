@@ -9,6 +9,6 @@ namespace Core.Interface
         Task<IEnumerable<DashProcess>> GetProcesses();
         Task<IEnumerable<DashProcess>> GetProcessesByUser(Guid userId);
         Task<IEnumerable<DashUser>> GetUsersByProcess(string processCode);
-        //Task<IEnumerable<string>> GetActionListUsersToNotify();
+        Task<IEnumerable<ProcessResult>> GetOpenProcessesPerTemplate(int templateId);
     }
 }

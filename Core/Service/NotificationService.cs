@@ -1,4 +1,5 @@
-﻿using Core.Interface;
+﻿using Core.Enum;
+using Core.Interface;
 using Core.Model.Notification;
 using Dapper;
 using Microsoft.Extensions.Configuration;
@@ -96,12 +97,12 @@ namespace Core.Service
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
             {
-                IsActive = scheduledNotification.IsActive,
-                NotificationTemplate = scheduledNotification.NotificationTemplate,
-                Scheduler = scheduledNotification.Scheduler,
-                NotifyAfterDays = scheduledNotification.NotifyAfterDays,
-                ReassignTo = scheduledNotification.ReassignTo,
-                CcContact = scheduledNotification.CcContact
+                scheduledNotification.IsActive,
+                scheduledNotification.NotificationTemplate,
+                scheduledNotification.Scheduler,
+                scheduledNotification.NotifyAfterDays,
+                scheduledNotification.ReassignTo,
+                scheduledNotification.CcContact
             });
             return await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.CreateScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
@@ -113,9 +114,9 @@ namespace Core.Service
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
             {
-                Id = scheduledNotification.Id,
-                IsActive = scheduledNotification.IsActive,
-                NotificationTemplate = scheduledNotification.NotificationTemplate,
+                scheduledNotification.Id,
+                scheduledNotification.IsActive,
+                scheduledNotification.NotificationTemplate,
                 Priority = scheduledNotification.Scheduler,
                 Role = scheduledNotification.NotifyAfterDays,
                 Process = scheduledNotification.ReassignTo,
@@ -217,7 +218,8 @@ namespace Core.Service
         public async Task<bool> SendEmailNotification(EmailNotification emailNotification)
         {
             var info = await GetNotificationInfo(emailNotification);
-            if (info is null) return false;
+
+            if (info is null) return false; else info.TemplateBody = ReplaceTags(info.TemplateBody, emailNotification.EventType);
             var message = new Message(new string[] { emailNotification.EmailAddress }, new string[] { emailNotification.CcContact }, info.TemplateSubject, info.TemplateBody);
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
@@ -235,6 +237,14 @@ namespace Core.Service
             emailSender.SendEmail(message);
 
             return true;
+        }
+
+        private string ReplaceTags(string template, string eventType)
+        {
+            if(eventType==EventType.ActionList.ToString())
+                return template.Replace("@UserName", "joed").Replace("@ProcessName", "test process").Replace("@WeekName", "test week").Replace("@MissingHours", "10").Replace("@LastAccessTime", "2002-01-01");
+            else
+                return template.Replace("@UserName", "joed").Replace("@ProcessName", "test process").Replace("@WeekName", "test week").Replace("@MissingHours", "10").Replace("@LastAccessTime", "2002-01-01");
         }
     }
 }

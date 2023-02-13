@@ -66,12 +66,17 @@ namespace Core.Service
             return processWithUsersAndRoles;
         }
 
-        //public async Task<IEnumerable<string>> GetActionListUsersToNotify()
-        //{
-        //    var processes = await GetProcessesFromDb();
-        //    var grouped = GroupByProcess(processes);
-        //    return processes.Select(x => x.UserEmail).Distinct();
-        //}
+        public async Task<IEnumerable<ProcessResult>> GetOpenProcessesPerTemplate(int templateId)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                TemplateId=templateId,
+            });
+            return await connection.QueryAsync<ProcessResult>("ed.GetOpenProcessesPerTemplate", param: dparam, commandType: CommandType.StoredProcedure);
+        }
 
         private async Task<IEnumerable<ProcessResult>> GetProcessesFromDb()
         {
