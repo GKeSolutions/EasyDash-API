@@ -51,15 +51,15 @@ namespace Core.Service
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
             {
-                Id = scheduledNotification.Id,
-                IsActive = scheduledNotification.IsActive,
-                NotificationTemplate = scheduledNotification.NotificationTemplate,
-                Priority = scheduledNotification.Scheduler,
-                Role = scheduledNotification.NotifyAfterDays,
-                Process = scheduledNotification.ReassignTo,
-                TemplateSubject = scheduledNotification.CcContact
+                scheduledNotification.Id,
+                scheduledNotification.IsActive,
+                scheduledNotification.NotificationTemplate,
+                scheduledNotification.Scheduler,
+                scheduledNotification.NotifyAfterDays,
+                scheduledNotification.ReassignTo,
+                scheduledNotification.CcContact
             });
-            var result = await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.UpdateScheduler", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            var result = await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.UpdateScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
             JobService.DeleteJob(scheduledNotification.Id.ToString());
             JobService.AddJob(scheduledNotification);
             return result;
