@@ -7,7 +7,7 @@
         public string Description { get; set; }
         public int Type { get; set; }
         public int Priority { get; set; }
-        public Guid Role { get; set; }
+        public Guid? Role { get; set; }
         public string Process { get; set; }
         public string TemplateSubject { get; set; }
         public string TemplateBody { get; set; }
