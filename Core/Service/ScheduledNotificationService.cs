@@ -22,7 +22,7 @@ namespace Core.Service
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
-            return await connection.QueryAsync<ScheduledNotification>("ed.GeNotificationScheduler");
+            return await connection.QueryAsync<ScheduledNotification>("ed.GetScheduledNotification");
         }
 
         public async Task<ScheduledNotification> CreateScheduledNotification(ScheduledNotification scheduledNotification)
