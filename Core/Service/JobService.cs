@@ -39,7 +39,7 @@ namespace Core.Service
                 var emailNotification = new EmailNotification
                 {
                     EmailAddress = user.UserEmail,
-                    CcContact = await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact)
+                    CcContact = "gilbert.khoury@gkesolutions.com"//await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact)
                 };
                 await NotificationService.SendEmailNotification(emailNotification);
             }
@@ -55,7 +55,7 @@ namespace Core.Service
                 var emailNotification = new EmailNotification
                 {
                     EmailAddress = user.EmailAddress,
-                    CcContact = await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact)
+                    CcContact = "gilbert.khoury@gkesolutions.com"//await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact)
                 };
                 await NotificationService.SendEmailNotification(emailNotification);
             }

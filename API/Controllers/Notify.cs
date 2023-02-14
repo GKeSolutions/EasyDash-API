@@ -23,9 +23,9 @@ namespace EasyDash_API.Controllers
         [HttpPost]
         public async Task<bool> Process([FromBody] ProcessNotification processNotification)
         {
-            if (processNotification.ProcessCode is not null || processNotification.UserId == Guid.Empty)
+            if (processNotification.ProcessCode is not null || processNotification.UserId != Guid.Empty)
             {
-                if (processNotification.ProcessCode is not null && processNotification.UserId != Guid.Empty)//Single Notify
+                if (processNotification.ProcessCode is not null && processNotification.UserId != Guid.Empty)//Single Notify-User clicked on the notify button
                     return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress=processNotification.EmailAddress,EventType=EventType.ActionList.ToString(),ProcessCode=processNotification.ProcessCode,UserId=processNotification.UserId});
                 else if (processNotification.ProcessCode is null)//User NotifyAll
                 {
