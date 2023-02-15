@@ -220,7 +220,7 @@ namespace Core.Service
             var info = await GetNotificationInfo(emailNotification);
 
             if (info is null) return false; else info.TemplateBody = ReplaceTags(info.TemplateBody, emailNotification.EventType);
-            var message = new Message(new string[] { emailNotification.EmailAddress }, new string[] { emailNotification.CcContact }, info.TemplateSubject, info.TemplateBody);
+            var message = new Message(new string[] { emailNotification.EmailAddress }, emailNotification.CcContact is null ? null : new string[] { emailNotification.CcContact }, info.TemplateSubject, info.TemplateBody);
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();
