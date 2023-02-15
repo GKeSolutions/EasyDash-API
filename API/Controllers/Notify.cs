@@ -1,5 +1,8 @@
 ﻿using Core.Enum;
 using Core.Interface;
+using Core.Model.Analytics;
+using Core.Model.Dashboard.User;
+using Core.Model.MissingTime;
 using Core.Model.Notification;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +29,14 @@ namespace EasyDash_API.Controllers
             if (processNotification.ProcessCode is not null || processNotification.UserId != Guid.Empty)
             {
                 if (processNotification.ProcessCode is not null && processNotification.UserId != Guid.Empty)//Single Notify-User clicked on the notify button
-                    return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress=processNotification.EmailAddress, CcContact = processNotification.CcContact, EventType=EventType.ActionList.ToString(),ProcessCode=processNotification.ProcessCode,UserId=processNotification.UserId});
+                {
+                    var info = await DashboardService.GetProcessInfoByProcId(processNotification.ProcessId);
+                    var tags = new Dictionary<string, string>();
+                    tags["UserName"] = info.UserName;
+                    tags["ProcessCaption"] = info.ProcessCaption;
+                    return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = processNotification.EmailAddress, CcContact = processNotification.CcContact, EventType = EventType.ActionList.ToString(), ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId }, tags);
+
+                }
                 else if (processNotification.ProcessCode is null)//User NotifyAll
                 {
                     var processes = await DashboardService.GetProcessesByUser(processNotification.UserId);
@@ -40,7 +50,10 @@ namespace EasyDash_API.Controllers
                             EventType = EventType.ActionList.ToString(),
                             UserId = processNotification.UserId
                         };
-                        await NotificationService.SendEmailNotification(notification);
+                        var tags = new Dictionary<string, string>();
+                        tags["UserName"] = process.UserName;
+                        tags["ProcessCaption"] = process.ProcessCaption;
+                        await NotificationService.SendEmailNotification(notification, tags);
                     }
                 }
                 else //process notify all
@@ -56,7 +69,10 @@ namespace EasyDash_API.Controllers
                             EventType = EventType.ActionList.ToString(),
                             UserId = user.UserId
                         };
-                        await NotificationService.SendEmailNotification(notification);
+                        var tags = new Dictionary<string, string>();
+                        tags["UserName"] = user.UserName;
+                        tags["ProcessCaption"] = user.ProcessCaption;
+                        await NotificationService.SendEmailNotification(notification, tags);
                     }
                 }
             }
@@ -80,7 +96,11 @@ namespace EasyDash_API.Controllers
                             EventType = EventType.MissingTime.ToString(),
                             UserId = missingTimeNotification.UserId,
                         };
-                        await NotificationService.SendEmailNotification(notification);
+                        var tags = new Dictionary<string, string>();
+                        tags["UserName"] = missingTime.UserName;
+                        //tags["WeekName"] = missingTime.WeekName;
+                        // tags["MissingHours"] = missingTime.MissingHours;
+                        await NotificationService.SendEmailNotification(notification, tags);
                     }
                 }
                 else
@@ -97,7 +117,11 @@ namespace EasyDash_API.Controllers
                                 EventType = EventType.MissingTime.ToString(),
                                 UserId = user.UserId,
                             };
-                            await NotificationService.SendEmailNotification(notification);
+                            var tags = new Dictionary<string, string>();
+                            tags["UserName"] = user.UserName;
+                            //tags["WeekName"] = user.WeekName;
+                            // tags["MissingHours"] = user.MissingHours;
+                            await NotificationService.SendEmailNotification(notification, tags);
                         }
                     }
                 }
@@ -116,7 +140,11 @@ namespace EasyDash_API.Controllers
                             EventType = EventType.MissingTime.ToString(),
                             UserId = missingTimeNotification.UserId,
                         };
-                        await NotificationService.SendEmailNotification(notification);
+                        var tags = new Dictionary<string, string>();
+                        tags["UserName"] = week.UserName;
+                        //tags["WeekName"] = user.WeekName;
+                        // tags["MissingHours"] = user.MissingHours;
+                        await NotificationService.SendEmailNotification(notification, tags);
                     }
                 }
             }

@@ -206,20 +206,26 @@ namespace Core.Service
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
             {
-                To = message.To,
-                Cc = message.Cc,
-                Subject = message.Subject,
-                Content = message.Content
+                message.To,
+                message.Cc,
+                message.Subject,
+                message.Content,
+                message.EventType,
+                message.IsManual,
+                message.IsReassign,
+                message.IsSystem,
+                message.ReassignTo,
+                message.TriggeredBy
             });
             return await connection.ExecuteAsync("ed.AddNotificationHistory", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
 
         }
 
-        public async Task<bool> SendEmailNotification(EmailNotification emailNotification)
+        public async Task<bool> SendEmailNotification(EmailNotification emailNotification, Dictionary<string, string> tags)
         {
             var info = await GetNotificationInfo(emailNotification);
 
-            if (info is null) return false; else info.TemplateBody = ReplaceTags(info.TemplateBody, emailNotification.EventType);
+            if (info is null) return false; else info.TemplateBody = ReplaceTags(info.TemplateBody, emailNotification.EventType, tags);
             var message = new Message(new string[] { emailNotification.EmailAddress }, emailNotification.CcContact is null ? null : new string[] { emailNotification.CcContact }, info.TemplateSubject, info.TemplateBody);
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
@@ -231,7 +237,12 @@ namespace Core.Service
                 Cc = message.To.Select(x => x.Address).First(),
                 Content = message.Content,
                 Subject = message.Subject,
-
+                EventType = emailNotification.EventType,
+                IsManual = emailNotification.IsManual,
+                IsReassign = emailNotification.IsReassign,
+                IsSystem = emailNotification.IsSystem,
+                ReassignTo = emailNotification.ReassignTo,
+                TriggeredBy = emailNotification.TriggeredBy
             };
             await AddNotificationHistory(messageHistory);
             emailSender.SendEmail(message);
@@ -239,10 +250,10 @@ namespace Core.Service
             return true;
         }
 
-        private string ReplaceTags(string template, string eventType)
+        private string ReplaceTags(string template, string eventType, Dictionary<string, string> tags)
         {
             if(eventType==EventType.ActionList.ToString())
-                return template.Replace("@UserName", "joed").Replace("@ProcessName", "test process").Replace("@WeekName", "test week").Replace("@MissingHours", "10").Replace("@LastAccessTime", "2002-01-01");
+                return template.Replace("@UserName", tags["UserName"]).Replace("@ProcessName", tags["ProcessCaption"]);
             else
                 return template.Replace("@UserName", "joed").Replace("@ProcessName", "test process").Replace("@WeekName", "test week").Replace("@MissingHours", "10").Replace("@LastAccessTime", "2002-01-01");
         }

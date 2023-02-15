@@ -15,6 +15,7 @@ namespace Core.Service
         {
             MissingTimeService = missingTimeService;
             DashboardService= dashboardService;
+            NotificationService= notificationService;
         }
         public bool AddJob(ScheduledNotification scheduledNotification)
         {
@@ -41,7 +42,10 @@ namespace Core.Service
                     EmailAddress = user.UserEmail,
                     CcContact = "gilbert.khoury@gkesolutions.com"//await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact)
                 };
-                await NotificationService.SendEmailNotification(emailNotification);
+                var tags = new Dictionary<string, string>();
+                tags["UserName"] = user.UserName;
+                tags["ProcessCaption"] = user.ProcessCaption;
+                await NotificationService.SendEmailNotification(emailNotification, tags);
             }
 
             return string.Empty;
@@ -57,7 +61,10 @@ namespace Core.Service
                     EmailAddress = user.EmailAddress,
                     CcContact = "gilbert.khoury@gkesolutions.com"//await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact)
                 };
-                await NotificationService.SendEmailNotification(emailNotification);
+                var tags = new Dictionary<string, string>();
+                tags["UserName"] = user.UserName;
+                //tags["ProcessCaption"] = user.ProcessCaption;
+                await NotificationService.SendEmailNotification(emailNotification, tags);
             }
 
             return string.Empty;

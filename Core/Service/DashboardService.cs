@@ -2,6 +2,7 @@
 using Core.Model.Dashboard.Process;
 using Core.Model.Dashboard.Role;
 using Core.Model.Dashboard.User;
+using Core.Model.Notification;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using System.Data;
@@ -78,6 +79,18 @@ namespace Core.Service
             return await connection.QueryAsync<ProcessResult>("ed.GetOpenProcessesPerTemplate", param: dparam, commandType: CommandType.StoredProcedure);
         }
 
+        public async Task<ProcessResult> GetProcessInfoByProcId(string processId)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                ProcessId=processId,
+            });
+            return await connection.QueryFirstOrDefaultAsync<ProcessResult>("ed.GetProcessInfoByProcId", param: dparam, commandType: CommandType.StoredProcedure);
+        }
+
         private async Task<IEnumerable<ProcessResult>> GetProcessesFromDb()
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
@@ -118,6 +131,7 @@ namespace Core.Service
                     UserName = g.First().UserName,
                     UserEmail = g.First().UserEmail,
                     UserId = g.First().UserId,
+                    ProcessCaption = g.First().ProcessCaption,
                     Processes = GetProcessesFromGroup(g)
                 });
             return grouped;
@@ -132,7 +146,8 @@ namespace Core.Service
                     ProcessCode = g.First().ProcessCode,
                     ProcessDescription = g.First().ProcessDescription,
                     ProcessCaption = g.First().ProcessCaption,
-                    Users = GetUsersFromGroup(g)
+                    Users = GetUsersFromGroup(g),
+                    UserName = g.First().UserName
                 }); ;
             return grouped;
         }
