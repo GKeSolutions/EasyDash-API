@@ -117,7 +117,7 @@ namespace Core.Service
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
             {
-                processCode
+                process=processCode
             });
             return await connection.QueryAsync<ProcessResult>("ed.GetUsersByProcess", param: dparam, commandType: CommandType.StoredProcedure);
         }
