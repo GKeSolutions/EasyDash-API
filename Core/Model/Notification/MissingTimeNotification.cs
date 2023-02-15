@@ -8,5 +8,6 @@
         public bool IsOneWeek { get; set; }
         public bool IsOneUser { get; set; }
         public string UserEmail { get; set; }
+        public string CcContact { get; set; }
     }
 }

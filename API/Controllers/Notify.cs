@@ -26,7 +26,7 @@ namespace EasyDash_API.Controllers
             if (processNotification.ProcessCode is not null || processNotification.UserId != Guid.Empty)
             {
                 if (processNotification.ProcessCode is not null && processNotification.UserId != Guid.Empty)//Single Notify-User clicked on the notify button
-                    return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress=processNotification.EmailAddress,EventType=EventType.ActionList.ToString(),ProcessCode=processNotification.ProcessCode,UserId=processNotification.UserId});
+                    return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress=processNotification.EmailAddress, CcContact = processNotification.CcContact, EventType=EventType.ActionList.ToString(),ProcessCode=processNotification.ProcessCode,UserId=processNotification.UserId});
                 else if (processNotification.ProcessCode is null)//User NotifyAll
                 {
                     var processes = await DashboardService.GetProcessesByUser(processNotification.UserId);
@@ -35,6 +35,7 @@ namespace EasyDash_API.Controllers
                         var notification = new EmailNotification
                         {
                             EmailAddress = processNotification.EmailAddress,
+                            CcContact = processNotification.CcContact,
                             ProcessCode = process.ProcessCode,
                             EventType = EventType.ActionList.ToString(),
                             UserId = processNotification.UserId
@@ -50,6 +51,7 @@ namespace EasyDash_API.Controllers
                         var notification = new EmailNotification
                         {
                             EmailAddress = user.UserEmail,
+                            CcContact = processNotification.CcContact,
                             ProcessCode = processNotification.ProcessCode,
                             EventType = EventType.ActionList.ToString(),
                             UserId = user.UserId
@@ -74,6 +76,7 @@ namespace EasyDash_API.Controllers
                         var notification = new EmailNotification
                         {
                             EmailAddress = missingTimeNotification.UserEmail,
+                            CcContact = missingTimeNotification.CcContact,
                             EventType = EventType.MissingTime.ToString(),
                             UserId = missingTimeNotification.UserId,
                         };
@@ -90,6 +93,7 @@ namespace EasyDash_API.Controllers
                             var notification = new EmailNotification
                             {
                                 EmailAddress = user.EmailAddress,
+                                CcContact = missingTimeNotification.CcContact,
                                 EventType = EventType.MissingTime.ToString(),
                                 UserId = user.UserId,
                             };
@@ -108,6 +112,7 @@ namespace EasyDash_API.Controllers
                         var notification = new EmailNotification
                         {
                             EmailAddress = missingTimeNotification.UserEmail,
+                            CcContact = missingTimeNotification.CcContact,
                             EventType = EventType.MissingTime.ToString(),
                             UserId = missingTimeNotification.UserId,
                         };
