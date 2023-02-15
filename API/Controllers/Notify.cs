@@ -26,54 +26,51 @@ namespace EasyDash_API.Controllers
         [HttpPost]
         public async Task<bool> Process([FromBody] ProcessNotification processNotification)
         {
-            if (processNotification.ProcessCode is not null || processNotification.UserId != Guid.Empty)
+            if(processNotification.ProcessId != null)
             {
-                if (processNotification.ProcessCode is not null && processNotification.UserId != Guid.Empty)//Single Notify-User clicked on the notify button
-                {
-                    var info = await DashboardService.GetProcessInfoByProcId(processNotification.ProcessId);
-                    var tags = new Dictionary<string, string>();
-                    tags["UserName"] = info.UserName;
-                    tags["ProcessCaption"] = info.ProcessCaption;
-                    return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = processNotification.EmailAddress, CcContact = processNotification.CcContact, EventType = EventType.ActionList.ToString(), ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId }, tags);
+                var info = await DashboardService.GetProcessInfoByProcId(processNotification.ProcessId);
+                var tags = new Dictionary<string, string>();
+                tags["UserName"] = info.UserName;
+                tags["ProcessCaption"] = info.ProcessCaption;
+                return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = processNotification.EmailAddress, CcContact = processNotification.CcContact, EventType = EventType.ActionList.ToString(), ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId }, tags);
 
-                }
-                else if (processNotification.ProcessCode is null)//User NotifyAll
+            }
+            else if (processNotification.UserId != Guid.Empty)//User NotifyAll
+            {
+                var processes = await DashboardService.GetProcessesByUser(processNotification.UserId);
+                foreach (var process in processes)
                 {
-                    var processes = await DashboardService.GetProcessesByUser(processNotification.UserId);
-                    foreach (var process in processes)
+                    var notification = new EmailNotification
                     {
-                        var notification = new EmailNotification
-                        {
-                            EmailAddress = processNotification.EmailAddress,
-                            CcContact = processNotification.CcContact,
-                            ProcessCode = process.ProcessCode,
-                            EventType = EventType.ActionList.ToString(),
-                            UserId = processNotification.UserId
-                        };
-                        var tags = new Dictionary<string, string>();
-                        tags["UserName"] = process.UserName;
-                        tags["ProcessCaption"] = process.ProcessCaption;
-                        await NotificationService.SendEmailNotification(notification, tags);
-                    }
+                        EmailAddress = processNotification.EmailAddress,
+                        CcContact = processNotification.CcContact,
+                        ProcessCode = process.ProcessCode,
+                        EventType = EventType.ActionList.ToString(),
+                        UserId = processNotification.UserId
+                    };
+                    var tags = new Dictionary<string, string>();
+                    tags["UserName"] = process.UserName;
+                    tags["ProcessCaption"] = process.ProcessCaption;
+                    await NotificationService.SendEmailNotification(notification, tags);
                 }
-                else //process notify all
+            }
+            else if(processNotification.ProcessCode != null) //process notify all
+            {
+                var users = await DashboardService.GetUsersByProcess(processNotification.ProcessCode);
+                foreach (var user in users)
                 {
-                    var users = await DashboardService.GetUsersByProcess(processNotification.ProcessCode);
-                    foreach (var user in users)
+                    var notification = new EmailNotification
                     {
-                        var notification = new EmailNotification
-                        {
-                            EmailAddress = user.UserEmail,
-                            CcContact = processNotification.CcContact,
-                            ProcessCode = processNotification.ProcessCode,
-                            EventType = EventType.ActionList.ToString(),
-                            UserId = user.UserId
-                        };
-                        var tags = new Dictionary<string, string>();
-                        tags["UserName"] = user.UserName;
-                        tags["ProcessCaption"] = user.ProcessCaption;
-                        await NotificationService.SendEmailNotification(notification, tags);
-                    }
+                        EmailAddress = user.UserEmail,
+                        CcContact = processNotification.CcContact,
+                        ProcessCode = processNotification.ProcessCode,
+                        EventType = EventType.ActionList.ToString(),
+                        UserId = user.UserId
+                    };
+                    var tags = new Dictionary<string, string>();
+                    tags["UserName"] = user.UserName;
+                    tags["ProcessCaption"] = user.ProcessCaption;
+                    await NotificationService.SendEmailNotification(notification, tags);
                 }
             }
             return true;
