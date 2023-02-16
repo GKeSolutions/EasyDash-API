@@ -1,10 +1,14 @@
 ﻿using Core.Enum;
 using Core.Interface;
 using Core.Model.Analytics;
+using Core.Model.Dashboard.Process;
 using Core.Model.Dashboard.User;
 using Core.Model.MissingTime;
 using Core.Model.Notification;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Diagnostics;
 
 namespace EasyDash_API.Controllers
 {
@@ -15,12 +19,14 @@ namespace EasyDash_API.Controllers
         private readonly INotificationService NotificationService;
         private readonly IDashboardService DashboardService;
         private readonly IMissingTimeService MissingTimeService;
+        private readonly IConfiguration Configuration;
 
-        public Notify(INotificationService notificationService, IDashboardService dashboardService, IMissingTimeService missingTimeService)
+        public Notify(INotificationService notificationService, IDashboardService dashboardService, IMissingTimeService missingTimeService, IConfiguration configuration)
         {
             NotificationService = notificationService;
             DashboardService = dashboardService;
             MissingTimeService = missingTimeService;
+            Configuration = configuration;
         }
 
         [HttpPost]
@@ -29,11 +35,8 @@ namespace EasyDash_API.Controllers
             if(processNotification.ProcessId != null)
             {
                 var info = await DashboardService.GetProcessInfoByProcId(processNotification.ProcessId);
-                var tags = new Dictionary<string, string>();
-                tags["UserName"] = info.UserName;
-                tags["ProcessCaption"] = info.ProcessCaption;
+                var tags = BuildProcessTags(info.UserName, info.ProcessCaption, info.LastUpdated, info.ProcessItemId);
                 return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = processNotification.EmailAddress, CcContact = processNotification.CcContact, EventType = EventType.ActionList.ToString(), ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId }, tags);
-
             }
             else if (processNotification.UserId != Guid.Empty)//User NotifyAll
             {
@@ -48,28 +51,24 @@ namespace EasyDash_API.Controllers
                         EventType = EventType.ActionList.ToString(),
                         UserId = processNotification.UserId
                     };
-                    var tags = new Dictionary<string, string>();
-                    tags["UserName"] = process.UserName;
-                    tags["ProcessCaption"] = process.ProcessCaption;
+                    var tags = BuildProcessTags(process.UserName, process.ProcessCaption, process.LastUpdated, process.ProcessItemId);
                     await NotificationService.SendEmailNotification(notification, tags);
                 }
             }
             else if(processNotification.ProcessCode != null) //process notify all
             {
-                var users = await DashboardService.GetUsersByProcess(processNotification.ProcessCode);
-                foreach (var user in users)
+                var processItems = await DashboardService.GetProcessItemsByProcessCode(processNotification.ProcessCode);
+                foreach (var processItem in processItems)
                 {
                     var notification = new EmailNotification
                     {
-                        EmailAddress = user.UserEmail,
+                        EmailAddress = processItem.UserEmail,
                         CcContact = processNotification.CcContact,
                         ProcessCode = processNotification.ProcessCode,
                         EventType = EventType.ActionList.ToString(),
-                        UserId = user.UserId
+                        UserId = processItem.UserId
                     };
-                    var tags = new Dictionary<string, string>();
-                    tags["UserName"] = user.UserName;
-                    tags["ProcessCaption"] = user.ProcessCaption;
+                    var tags = BuildProcessTags(processItem.UserName, processItem.ProcessCaption, processItem.LastUpdated, processItem.ProcessItemId);
                     await NotificationService.SendEmailNotification(notification, tags);
                 }
             }
@@ -93,10 +92,7 @@ namespace EasyDash_API.Controllers
                             EventType = EventType.MissingTime.ToString(),
                             UserId = missingTimeNotification.UserId,
                         };
-                        var tags = new Dictionary<string, string>();
-                        tags["UserName"] = missingTime.UserName;
-                        //tags["WeekName"] = missingTime.WeekName;
-                        // tags["MissingHours"] = missingTime.MissingHours;
+                        var tags = BuildMissingTimeTags(missingTime.UserName, "week name", 10);
                         await NotificationService.SendEmailNotification(notification, tags);
                     }
                 }
@@ -114,10 +110,7 @@ namespace EasyDash_API.Controllers
                                 EventType = EventType.MissingTime.ToString(),
                                 UserId = user.UserId,
                             };
-                            var tags = new Dictionary<string, string>();
-                            tags["UserName"] = user.UserName;
-                            //tags["WeekName"] = user.WeekName;
-                            // tags["MissingHours"] = user.MissingHours;
+                            var tags = BuildMissingTimeTags(user.UserName, "week name", 10);
                             await NotificationService.SendEmailNotification(notification, tags);
                         }
                     }
@@ -137,15 +130,31 @@ namespace EasyDash_API.Controllers
                             EventType = EventType.MissingTime.ToString(),
                             UserId = missingTimeNotification.UserId,
                         };
-                        var tags = new Dictionary<string, string>();
-                        tags["UserName"] = week.UserName;
-                        //tags["WeekName"] = user.WeekName;
-                        // tags["MissingHours"] = user.MissingHours;
+                        var tags = BuildMissingTimeTags(week.UserName, "week name", 10);
                         await NotificationService.SendEmailNotification(notification, tags);
                     }
                 }
             }
             return true;
+        }
+
+        private Dictionary<string, string> BuildProcessTags(string userName, string processCaption, string lastUpdated, Guid processItemId)
+        {
+            var tags = new Dictionary<string, string>();
+            tags["UserName"] = userName;
+            tags["ProcessCaption"] = processCaption;
+            tags["LastUpdated"] = lastUpdated;
+            tags["ProcessLink"] = "<a href=" + Configuration["InstanceConfiguration:BaseUrl"] + "Process" + processItemId + "> Process Link</a> ";
+            return tags;
+        }
+
+        private Dictionary<string, string> BuildMissingTimeTags(string userName, string weekName, int missingHours)
+        {
+            var tags = new Dictionary<string, string>();
+            tags["UserName"] = userName;
+            tags["WeekName"] = weekName;
+            tags["MissingHours"] = missingHours.ToString();
+            return tags;
         }
     }
 }

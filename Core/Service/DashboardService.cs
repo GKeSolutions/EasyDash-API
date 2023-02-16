@@ -28,9 +28,9 @@ namespace Core.Service
             return MapUserToRoles(grouped.ToList(), userRoles);
         }
 
-        public async Task<IEnumerable<DashUser>> GetUsersByProcess(string processCode)
+        public async Task<IEnumerable<DashUser>> GetProcessItemsByProcessCode(string processCode)
         {
-            var processes = await GetUsersByProcessFromDb(processCode);
+            var processes = await GetProcessItemsByProcessCodeFromDb(processCode);
             var grouped = GroupByUser(processes);
             var distinctUsers = grouped.Select(x => x.UserId).Distinct();
             var userRoles = await GetUsersRoles(distinctUsers);
@@ -110,7 +110,7 @@ namespace Core.Service
             return await connection.QueryAsync<ProcessResult>("ed.GetOpenProcessesByUser", param: dparam, commandType: CommandType.StoredProcedure);
         }
 
-        private async Task<IEnumerable<ProcessResult>> GetUsersByProcessFromDb(string processCode)
+        private async Task<IEnumerable<ProcessResult>> GetProcessItemsByProcessCodeFromDb(string processCode)
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
@@ -119,7 +119,7 @@ namespace Core.Service
             {
                 process=processCode
             });
-            return await connection.QueryAsync<ProcessResult>("ed.GetUsersByProcess", param: dparam, commandType: CommandType.StoredProcedure);
+            return await connection.QueryAsync<ProcessResult>("ed.GetProcessItemsByProcessCode", param: dparam, commandType: CommandType.StoredProcedure);
         }
 
         private IEnumerable<DashUser> GroupByUser(IEnumerable<ProcessResult> processes)
@@ -132,7 +132,8 @@ namespace Core.Service
                     UserEmail = g.First().UserEmail,
                     UserId = g.First().UserId,
                     ProcessCaption = g.First().ProcessCaption,
-                    Processes = GetProcessesFromGroup(g)
+                    Processes = GetProcessesFromGroup(g),
+                    LastUpdated = g.First().LastUpdated
                 });
             return grouped;
         }
@@ -147,7 +148,8 @@ namespace Core.Service
                     ProcessDescription = g.First().ProcessDescription,
                     ProcessCaption = g.First().ProcessCaption,
                     Users = GetUsersFromGroup(g),
-                    UserName = g.First().UserName
+                    UserName = g.First().UserName,
+                    LastUpdated= g.First().LastUpdated
                 }); ;
             return grouped;
         }
