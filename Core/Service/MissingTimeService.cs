@@ -50,10 +50,10 @@ namespace Core.Service
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
             {
-                StartDate = startDate,
-                EndDate = endDate,
+                WeekStartDate = startDate,
+                WeekEndDate = endDate,
             });
-            var result = await connection.QueryAsync<Time>("ed.GetUsersWithMissingTimePerWeek", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            var result = await connection.QueryAsync<Time>("ed.GetUsersTimePerWeek", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
             return result;
         }
 
