@@ -255,7 +255,7 @@ namespace Core.Service
             if(eventType==EventType.ActionList.ToString())
                 return template.Replace("@UserName", tags["UserName"]).Replace("@ProcessName", tags["ProcessCaption"]).Replace("@LastAccessTime", tags["LastUpdated"]);
             else
-                return template.Replace("@UserName", "joed").Replace("@ProcessName", "test process").Replace("@WeekName", "test week").Replace("@MissingHours", "10").Replace("@LastAccessTime", "2002-01-01");
+                return template.Replace("@UserName", tags["UserName"]).Replace("@WeekName", tags["WeekName"]).Replace("@MissingHours", tags["MissingHours"]).Replace("@LoggedHours", tags["LoggedHours"]).Replace("@RequiredHours", tags["RequiredHours"]);
         }
     }
 }
