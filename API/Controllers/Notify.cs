@@ -86,7 +86,7 @@ namespace EasyDash_API.Controllers
                     {
                         var notification = new EmailNotification
                         {
-                            EmailAddress = missingTimeNotification.UserEmail,
+                            EmailAddress = missingTime.EmailAddress,
                             CcContact = missingTimeNotification.CcContact,
                             EventType = EventType.MissingTime.ToString(),
                             UserId = missingTimeNotification.UserId,
