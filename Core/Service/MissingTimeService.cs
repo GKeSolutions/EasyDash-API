@@ -36,8 +36,8 @@ namespace Core.Service
             dparam.AddDynamicParams(new
             {
                 UserId = userId,
-                StartDate = startDate,
-                EndDate = endDate,
+                WeekStartDate = startDate,
+                WeekEndDate = endDate,
             });
             var result = await connection.QueryFirstAsync<Time>("ed.GetTimePerUserPerWeek", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
             return result;
