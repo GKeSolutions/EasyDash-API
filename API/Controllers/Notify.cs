@@ -143,7 +143,7 @@ namespace EasyDash_API.Controllers
             tags["UserName"] = userName;
             tags["ProcessCaption"] = processCaption;
             tags["LastUpdated"] = lastUpdated;
-            tags["ProcessLink"] = "<a href=" + Configuration["InstanceConfiguration:BaseUrl"] + "Process" + processItemId + "> Process Link</a> ";
+            tags["ProcessLink"] = "<a href=" + Configuration["InstanceConfiguration:BaseUrl"] + "Process/" + processItemId + "> Process Link</a> ";
             return tags;
         }
 

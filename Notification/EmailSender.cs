@@ -23,7 +23,7 @@ namespace Notification
             emailMessage.To.AddRange(message.To);
             if(message.Cc is not null) emailMessage.Cc.AddRange(message.Cc);
             emailMessage.Subject = message.Subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = message.Content };
             return emailMessage;
         }
         private void Send(MimeMessage mailMessage)
