@@ -1,14 +1,7 @@
 ﻿using Core.Enum;
 using Core.Interface;
-using Core.Model.Analytics;
-using Core.Model.Dashboard.Process;
-using Core.Model.Dashboard.User;
-using Core.Model.MissingTime;
 using Core.Model.Notification;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Diagnostics;
 
 namespace EasyDash_API.Controllers
 {
@@ -43,16 +36,22 @@ namespace EasyDash_API.Controllers
                 var processes = await DashboardService.GetProcessesByUser(processNotification.UserId);
                 foreach (var process in processes)
                 {
-                    var notification = new EmailNotification
+                    if (process.Users != null || process?.Users?.Count != 0)
                     {
-                        EmailAddress = processNotification.EmailAddress,
-                        CcContact = processNotification.CcContact,
-                        ProcessCode = process.ProcessCode,
-                        EventType = EventType.ActionList.ToString(),
-                        UserId = processNotification.UserId
-                    };
-                    var tags = BuildProcessTags(process.UserName, process.ProcessCaption, process.LastUpdated, process.ProcessItemId);
-                    await NotificationService.SendEmailNotification(notification, tags);
+                        if (!string.IsNullOrEmpty(process?.Users?.FirstOrDefault()?.UserEmail))
+                        {
+                            var notification = new EmailNotification
+                            {
+                                EmailAddress = process?.Users?.FirstOrDefault()?.UserEmail,
+                                CcContact = processNotification.CcContact,
+                                ProcessCode = process?.ProcessCode,
+                                EventType = EventType.ActionList.ToString(),
+                                UserId = processNotification.UserId
+                            };
+                            var tags = BuildProcessTags(process.UserName, process.ProcessCaption, process.LastUpdated, process.ProcessItemId);
+                            await NotificationService.SendEmailNotification(notification, tags);
+                        }
+                    }
                 }
             }
             else if(processNotification.ProcessCode != null) //process notify all
@@ -92,7 +91,7 @@ namespace EasyDash_API.Controllers
                             EventType = EventType.MissingTime.ToString(),
                             UserId = missingTimeNotification.UserId,
                         };
-                        var tags = BuildMissingTimeTags(missingTime.UserName, "week name", 10);
+                        var tags = BuildMissingTimeTags(missingTime.UserName, missingTimeNotification.StartDate.ToString(), missingTime.WeeklyHoursRequired, missingTime.WorkHrs);
                         await NotificationService.SendEmailNotification(notification, tags);
                     }
                 }
@@ -110,7 +109,7 @@ namespace EasyDash_API.Controllers
                                 EventType = EventType.MissingTime.ToString(),
                                 UserId = user.UserId,
                             };
-                            var tags = BuildMissingTimeTags(user.UserName, "week name", 10);
+                            var tags = BuildMissingTimeTags(user.UserName, missingTimeNotification.StartDate.ToString(), user.WeeklyHoursRequired, user.WorkHrs);
                             await NotificationService.SendEmailNotification(notification, tags);
                         }
                     }
@@ -130,7 +129,7 @@ namespace EasyDash_API.Controllers
                             EventType = EventType.MissingTime.ToString(),
                             UserId = missingTimeNotification.UserId,
                         };
-                        var tags = BuildMissingTimeTags(week.UserName, "week name", 10);
+                        var tags = BuildMissingTimeTags(week.UserName, week.WeekStartDate.ToString(), week.WeeklyHoursRequired, week.WorkHrs);
                         await NotificationService.SendEmailNotification(notification, tags);
                     }
                 }
@@ -148,12 +147,14 @@ namespace EasyDash_API.Controllers
             return tags;
         }
 
-        private Dictionary<string, string> BuildMissingTimeTags(string userName, string weekName, int missingHours)
+        private Dictionary<string, string> BuildMissingTimeTags(string userName, string weekName, decimal requiredHours, int loggedHours)
         {
             var tags = new Dictionary<string, string>();
             tags["UserName"] = userName;
             tags["WeekName"] = weekName;
-            tags["MissingHours"] = missingHours.ToString();
+            tags["MissingHours"] = (requiredHours - loggedHours).ToString();
+            tags["RequiredHours"] = requiredHours.ToString();
+            tags["LoggedHours"] = loggedHours.ToString();
             return tags;
         }
     }
