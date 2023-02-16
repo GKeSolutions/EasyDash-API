@@ -253,7 +253,7 @@ namespace Core.Service
         private string ReplaceTags(string template, string eventType, Dictionary<string, string> tags)
         {
             if(eventType==EventType.ActionList.ToString())
-                return template.Replace("@UserName", tags["UserName"]).Replace("@ProcessName", tags["ProcessCaption"]).Replace("@lastAccessTime", tags["LastUpdated"]).Replace("@ProcessLink", tags["ProcessLink"]);
+                return template.Replace("@UserName", tags["UserName"]).Replace("@ProcessName", tags["ProcessCaption"]).Replace("@LastAccessTime", tags["LastUpdated"]).Replace("@ProcessLink", tags["ProcessLink"]);
             else
                 return template.Replace("@UserName", tags["UserName"]).Replace("@WeekName", tags["WeekName"]).Replace("@MissingHours", tags["MissingHours"]).Replace("@LoggedHours", tags["LoggedHours"]).Replace("@RequiredHours", tags["RequiredHours"]);
         }
