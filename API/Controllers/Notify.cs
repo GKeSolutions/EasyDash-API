@@ -29,7 +29,7 @@ namespace EasyDash_API.Controllers
             {
                 var info = await DashboardService.GetProcessInfoByProcId(processNotification.ProcessId);
                 var tags = BuildProcessTags(info.UserName, info.ProcessCaption, info.LastUpdated, info.ProcessItemId);
-                return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = processNotification.EmailAddress, CcContact = processNotification.CcContact, EventType = EventType.ActionList.ToString(), ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId }, tags);
+                return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = info.UserEmail, CcContact = processNotification.CcContact, EventType = EventType.ActionList.ToString(), ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId }, tags);
             }
             else if (processNotification.UserId != Guid.Empty)//User NotifyAll
             {
