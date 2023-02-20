@@ -61,7 +61,7 @@ namespace Core.Service
             });
             var result = await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.UpdateScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
             JobService.DeleteJob(scheduledNotification.Id.ToString());
-            JobService.AddJob(scheduledNotification);
+            JobService.AddJob(result);
             return result;
         }
 
@@ -74,7 +74,9 @@ namespace Core.Service
             {
                 Id = scheduledNotification
             });
-            return await connection.ExecuteAsync("ed.DeleteScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            var result = await connection.ExecuteAsync("ed.DeleteScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            JobService.DeleteJob(scheduledNotification.ToString());
+            return result;
         }
         #endregion
     }
