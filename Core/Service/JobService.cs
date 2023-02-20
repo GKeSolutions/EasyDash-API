@@ -73,7 +73,7 @@ namespace Core.Service
                         NotificationTemplateId = scheduledNotification.NotificationTemplate,
                         EventType = (int)EventType.MissingTime
                     };
-                    var tags = BuildMissingTimeTags(user.UserName, user.WeekStartDate.ToString(), user.WeeklyHoursRequired, user.WorkHrs);
+                    var tags = BuildMissingTimeTags(user.UserName, user.WeekStartDate, user.WeeklyHoursRequired, user.WorkHrs);
                     await NotificationService.SendEmailNotification(emailNotification, tags, true);
                 }
             }
@@ -91,11 +91,11 @@ namespace Core.Service
             return tags;
         }
 
-        private Dictionary<string, string> BuildMissingTimeTags(string userName, string weekName, decimal requiredHours, int loggedHours)
+        private Dictionary<string, string> BuildMissingTimeTags(string userName, DateTime weekName, decimal requiredHours, int loggedHours)
         {
             var tags = new Dictionary<string, string>();
             tags["UserName"] = userName;
-            tags["WeekName"] = weekName;
+            tags["WeekName"] = weekName.ToString("MM/dd/yyyy");;
             tags["MissingHours"] = (requiredHours - loggedHours).ToString();
             tags["RequiredHours"] = requiredHours.ToString();
             tags["LoggedHours"] = loggedHours.ToString();
