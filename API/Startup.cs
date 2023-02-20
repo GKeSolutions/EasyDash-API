@@ -2,6 +2,7 @@
 using Core.Service;
 using Hangfire;
 using Hangfire.SqlServer;
+using Microsoft.Extensions.Options;
 using Notification;
 using System.Text.Json.Serialization;
 
@@ -79,7 +80,7 @@ namespace EasyDash_API
             {
                 endpoints.MapControllers();
             });
-            app.UseHangfireDashboard();
+            app.UseHangfireDashboard("/hangfire");
             //backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
         }
     }

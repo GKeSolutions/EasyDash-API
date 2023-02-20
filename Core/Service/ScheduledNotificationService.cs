@@ -40,7 +40,7 @@ namespace Core.Service
                 CcContact = scheduledNotification.CcContact
             });
             var result = await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.CreateScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
-            JobService.AddJob(scheduledNotification);
+            JobService.AddJob(result);
             return result;
         }
 

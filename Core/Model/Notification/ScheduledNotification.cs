@@ -10,8 +10,8 @@ namespace Core.Model.Notification
         public string CronExpression { get; set; }
         public int Scheduler { get; set; }
         public int NotifyAfterDays { get; set; }
-        public EventType EventType { get; set; }
+        public int EventType { get; set; }
         public Guid ReassignTo { get; set; }
-        public Guid CcContact { get; set; }
+        public string CcContact { get; set; }
     }
 }

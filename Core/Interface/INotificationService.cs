@@ -11,6 +11,7 @@ public interface INotificationService
     Task<int> DeleteTemplate(int template);
     Task<NotificationInfo> GetNotificationInfo(EmailNotification notification);
     Task<int> AddNotificationHistory(MessageHistory messageHistory);
-    Task<bool> SendEmailNotification(EmailNotification emailNotification, Dictionary<string, string> tags);
+    Task<bool> SendEmailNotification(EmailNotification emailNotification, Dictionary<string, string> tags, bool isSystemJob = false);
+    Task<NotificationInfo> GetNotificationTemplateInfo(int notificationTemplateId);
 }
 

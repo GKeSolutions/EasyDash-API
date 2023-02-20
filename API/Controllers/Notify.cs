@@ -29,7 +29,7 @@ namespace EasyDash_API.Controllers
             {
                 var info = await DashboardService.GetProcessInfoByProcId(processNotification.ProcessId);
                 var tags = BuildProcessTags(info.UserName, info.ProcessCaption, info.LastUpdated, info.ProcessItemId);
-                return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = info.UserEmail, CcContact = processNotification.CcContact, EventType = EventType.ActionList.ToString(), ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId }, tags);
+                return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = info.UserEmail, CcContact = processNotification.CcContact, EventType = (int)EventType.ActionList, ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId }, tags);
             }
             else if (processNotification.UserId != Guid.Empty)//User NotifyAll
             {
@@ -45,7 +45,7 @@ namespace EasyDash_API.Controllers
                                 EmailAddress = process?.Users?.FirstOrDefault()?.UserEmail,
                                 CcContact = processNotification.CcContact,
                                 ProcessCode = process?.ProcessCode,
-                                EventType = EventType.ActionList.ToString(),
+                                EventType = (int)EventType.ActionList,
                                 UserId = processNotification.UserId
                             };
                             var tags = BuildProcessTags(process.UserName, process.ProcessCaption, process.LastUpdated, process.ProcessItemId);
@@ -64,7 +64,7 @@ namespace EasyDash_API.Controllers
                         EmailAddress = processItem.UserEmail,
                         CcContact = processNotification.CcContact,
                         ProcessCode = processNotification.ProcessCode,
-                        EventType = EventType.ActionList.ToString(),
+                        EventType = (int)EventType.ActionList,
                         UserId = processItem.UserId
                     };
                     var tags = BuildProcessTags(processItem.UserName, processItem.ProcessCaption, processItem.LastUpdated, processItem.ProcessItemId);
@@ -77,7 +77,7 @@ namespace EasyDash_API.Controllers
         [HttpPost]
         public async Task<bool> MissingTime([FromBody] MissingTimeNotification missingTimeNotification)
         {
-            if (missingTimeNotification.IsOneWeek)
+                if (missingTimeNotification.IsOneWeek)
             {
                 if (missingTimeNotification.IsOneUser)
                 {
@@ -88,10 +88,10 @@ namespace EasyDash_API.Controllers
                         {
                             EmailAddress = missingTime.EmailAddress,
                             CcContact = missingTimeNotification.CcContact,
-                            EventType = EventType.MissingTime.ToString(),
+                            EventType = (int)EventType.MissingTime,
                             UserId = missingTimeNotification.UserId,
                         };
-                        var tags = BuildMissingTimeTags(missingTime.UserName, missingTimeNotification.StartDate.ToString(), missingTime.WeeklyHoursRequired, missingTime.WorkHrs);
+                        var tags = BuildMissingTimeTags(missingTime.UserName, missingTimeNotification.StartDate, missingTime.WeeklyHoursRequired, missingTime.WorkHrs);
                         await NotificationService.SendEmailNotification(notification, tags);
                     }
                 }
@@ -106,10 +106,10 @@ namespace EasyDash_API.Controllers
                             {
                                 EmailAddress = user.EmailAddress,
                                 CcContact = missingTimeNotification.CcContact,
-                                EventType = EventType.MissingTime.ToString(),
+                                EventType = (int)EventType.MissingTime,
                                 UserId = user.UserId,
                             };
-                            var tags = BuildMissingTimeTags(user.UserName, missingTimeNotification.StartDate.ToString(), user.WeeklyHoursRequired, user.WorkHrs);
+                            var tags = BuildMissingTimeTags(user.UserName, missingTimeNotification.StartDate, user.WeeklyHoursRequired, user.WorkHrs);
                             await NotificationService.SendEmailNotification(notification, tags);
                         }
                     }
@@ -126,10 +126,10 @@ namespace EasyDash_API.Controllers
                         {
                             EmailAddress = missingTimeNotification.UserEmail,
                             CcContact = missingTimeNotification.CcContact,
-                            EventType = EventType.MissingTime.ToString(),
+                            EventType = (int)EventType.MissingTime  ,
                             UserId = missingTimeNotification.UserId,
                         };
-                        var tags = BuildMissingTimeTags(week.UserName, week.WeekStartDate.ToString(), week.WeeklyHoursRequired, week.WorkHrs);
+                        var tags = BuildMissingTimeTags(week.UserName, week.WeekStartDate, week.WeeklyHoursRequired, week.WorkHrs);
                         await NotificationService.SendEmailNotification(notification, tags);
                     }
                 }
@@ -147,11 +147,11 @@ namespace EasyDash_API.Controllers
             return tags;
         }
 
-        private Dictionary<string, string> BuildMissingTimeTags(string userName, string weekName, decimal requiredHours, int loggedHours)
+        private Dictionary<string, string> BuildMissingTimeTags(string userName, DateTime weekName, decimal requiredHours, int loggedHours)
         {
             var tags = new Dictionary<string, string>();
             tags["UserName"] = userName;
-            tags["WeekName"] = weekName;
+            tags["WeekName"] = weekName.ToString("MM/dd/yyyy");
             tags["MissingHours"] = (requiredHours - loggedHours).ToString();
             tags["RequiredHours"] = requiredHours.ToString();
             tags["LoggedHours"] = loggedHours.ToString();

@@ -22,9 +22,9 @@ namespace Core.Service
         }
         public bool AddJob(ScheduledNotification scheduledNotification)
         {
-            if(scheduledNotification.EventType == EventType.ActionList)
+            if(scheduledNotification.EventType == (int)EventType.ActionList)
                 RecurringJob.AddOrUpdate(scheduledNotification.Id.ToString(), () => SendEmailActionList(scheduledNotification), scheduledNotification.CronExpression);
-            else if (scheduledNotification.EventType == EventType.MissingTime)
+            else if (scheduledNotification.EventType == (int)EventType.MissingTime)
                 RecurringJob.AddOrUpdate(scheduledNotification.Id.ToString(), () => SendEmailMissingTime(scheduledNotification), scheduledNotification.CronExpression);
             return true;
         }
@@ -37,33 +37,45 @@ namespace Core.Service
 
         public async Task<string> SendEmailActionList(ScheduledNotification scheduledNotification)
         {
+            
             var users = await DashboardService.GetOpenProcessesPerTemplate(scheduledNotification.NotificationTemplate);
             foreach (var user in users)
             {
-                var emailNotification = new EmailNotification
+                if (!string.IsNullOrEmpty(user.UserEmail))
                 {
-                    EmailAddress = user.UserEmail,
-                    CcContact = "gilbert.khoury@gkesolutions.com"//await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact)
-                };
-                var tags = BuildProcessTags(user.UserName, user.ProcessCaption, user.LastUpdated, user.ProcessItemId);
-                await NotificationService.SendEmailNotification(emailNotification, tags);
+                    var emailNotification = new EmailNotification
+                    {
+                        EmailAddress = user.UserEmail,
+                        CcContact = "gilbert.khoury@gkesolutions.com",//await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact)
+                        NotificationTemplateId = scheduledNotification.NotificationTemplate,
+                        EventType = (int)EventType.ActionList
+                    };
+                    var tags = BuildProcessTags(user.UserName, user.ProcessCaption, user.LastUpdated, user.ProcessItemId);
+                    await NotificationService.SendEmailNotification(emailNotification, tags, true);
+                }
+
             }
 
             return string.Empty;
         }
 
-        private async Task<string> SendEmailMissingTime(ScheduledNotification scheduledNotification)
+        public async Task<string> SendEmailMissingTime(ScheduledNotification scheduledNotification)
         {
             var users = await MissingTimeService.GetMissingTimeUsersPerTemplate(scheduledNotification.NotificationTemplate);
             foreach (var user in users)
             {
-                var emailNotification = new EmailNotification
+                if (!string.IsNullOrEmpty(user.EmailAddress))
                 {
-                    EmailAddress = user.EmailAddress,
-                    CcContact = "gilbert.khoury@gkesolutions.com"//await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact)
-                };
-                var tags = BuildMissingTimeTags(user.UserName, user.WeekStartDate.ToString(), user.WeeklyHoursRequired, user.WorkHrs);
-                await NotificationService.SendEmailNotification(emailNotification, tags);
+                    var emailNotification = new EmailNotification
+                    {
+                        EmailAddress = user.EmailAddress,
+                        CcContact = "gilbert.khoury@gkesolutions.com",//await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact)
+                        NotificationTemplateId = scheduledNotification.NotificationTemplate,
+                        EventType = (int)EventType.MissingTime
+                    };
+                    var tags = BuildMissingTimeTags(user.UserName, user.WeekStartDate.ToString(), user.WeeklyHoursRequired, user.WorkHrs);
+                    await NotificationService.SendEmailNotification(emailNotification, tags, true);
+                }
             }
 
             return string.Empty;

@@ -199,6 +199,18 @@ namespace Core.Service
             return await connection.QueryFirstOrDefaultAsync<NotificationInfo>("ed.GetUserNotificationTemplate", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
 
+        public async Task<NotificationInfo> GetNotificationTemplateInfo(int notificationTemplateId)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                NotificationTemplateId = notificationTemplateId
+            });
+            return await connection.QueryFirstOrDefaultAsync<NotificationInfo>("ed.GetNotificationTemplateInfo", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+        }
+
         public async Task<int> AddNotificationHistory(MessageHistory message)
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
@@ -221,9 +233,13 @@ namespace Core.Service
 
         }
 
-        public async Task<bool> SendEmailNotification(EmailNotification emailNotification, Dictionary<string, string> tags)
+        public async Task<bool> SendEmailNotification(EmailNotification emailNotification, Dictionary<string, string> tags, bool isSystemJob=false)
         {
-            var info = await GetNotificationInfo(emailNotification);
+            NotificationInfo info;
+            if (isSystemJob)
+                info = await GetNotificationTemplateInfo(emailNotification.NotificationTemplateId);
+            else
+                info = await GetNotificationInfo(emailNotification);
 
             if (info is null) return false; else info.TemplateBody = ReplaceTags(info.TemplateBody, emailNotification.EventType, tags);
             var message = new Message(new string[] { emailNotification.EmailAddress }, emailNotification.CcContact is null ? null : new string[] { emailNotification.CcContact }, info.TemplateSubject, info.TemplateBody);
@@ -240,7 +256,7 @@ namespace Core.Service
                 EventType = emailNotification.EventType,
                 IsManual = emailNotification.IsManual,
                 IsReassign = emailNotification.IsReassign,
-                IsSystem = emailNotification.IsSystem,
+                IsSystem = isSystemJob,
                 ReassignTo = emailNotification.ReassignTo,
                 TriggeredBy = emailNotification.TriggeredBy
             };
@@ -250,10 +266,10 @@ namespace Core.Service
             return true;
         }
 
-        private string ReplaceTags(string template, string eventType, Dictionary<string, string> tags)
+        private string ReplaceTags(string template, int eventType, Dictionary<string, string> tags)
         {
-            if(eventType==EventType.ActionList.ToString())
-                return template.Replace("@UserName", tags["UserName"]).Replace("@ProcessName", tags["ProcessCaption"]).Replace("@LastAccessTime", tags["LastUpdated"]).Replace("@ProcessLink", tags["ProcessLink"]);
+            if(eventType==(int)EventType.ActionList)
+                return template.Replace("@UserName", tags["UserName"]).Replace("@ProcessName", "'" + tags["ProcessCaption"] + "'").Replace("@LastAccessTime", tags["LastUpdated"]).Replace("@ProcessLink", tags["ProcessLink"]);
             else
                 return template.Replace("@UserName", tags["UserName"]).Replace("@WeekName", tags["WeekName"]).Replace("@MissingHours", tags["MissingHours"]).Replace("@LoggedHours", tags["LoggedHours"]).Replace("@RequiredHours", tags["RequiredHours"]);
         }
