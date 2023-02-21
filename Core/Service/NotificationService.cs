@@ -227,6 +227,13 @@ namespace Core.Service
                 message.IsReassign,
                 message.IsSystem,
                 message.ReassignTo,
+                message.ProcessCode,
+                message.ProcessDescription,
+                message.ProcItemId,
+                message.LastAccessTime,
+                message.MissingHours,
+                message.RequiredHours,
+                message.LoggedHours,
                 message.TriggeredBy
             });
             return await connection.ExecuteAsync("ed.AddNotificationHistory", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
