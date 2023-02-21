@@ -14,15 +14,15 @@ namespace Core.Service
         {
             Configuration = configuration;
         }
-        public async Task<IEnumerable<UserAnalytic>> GetAnalyticUsers()
+        public async Task<IEnumerable<UserAnalytic>> GetAnalyticUsers(DateTime startDate, DateTime endDate)
         {
-            var analyticsData = await GetAnalyticsFromDb();
+            var analyticsData = await GetAnalyticsFromDb(startDate, endDate);
             return GroupByUser(analyticsData);
         }
 
-        public async Task<IEnumerable<ProcessAnalytic>> GetAnalyticProcesses()
+        public async Task<IEnumerable<ProcessAnalytic>> GetAnalyticProcesses(DateTime startDate, DateTime endDate)
         {
-            var analyticsData = await GetAnalyticsFromDb();
+            var analyticsData = await GetAnalyticsFromDb(startDate, endDate);
             return GroupByProcess(analyticsData);
         }
 
@@ -52,15 +52,15 @@ namespace Core.Service
             return await connection.QueryAsync<Process>("ed.Analytics_ProcessList", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
 
-        private async Task<IEnumerable<Analytics>> GetAnalyticsFromDb()
+        private async Task<IEnumerable<Analytics>> GetAnalyticsFromDb(DateTime startDate, DateTime endDate)
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
             {
-                StartDate = DateTime.Now.AddYears(-3),
-                EndDate = DateTime.Now,
+                StartDate = startDate,
+                EndDate = endDate,
             });
             return await connection.QueryAsync<Analytics>("ed.Analytics", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
