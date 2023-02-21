@@ -19,7 +19,7 @@ namespace Notification
         private MimeMessage CreateEmailMessage(Message message)
         {
             var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress("joe",_emailConfig.From));
+            emailMessage.From.Add(new MailboxAddress(_emailConfig.DisplayName, _emailConfig.From));
             emailMessage.To.AddRange(message.To);
             if(message.Cc is not null) emailMessage.Cc.AddRange(message.Cc);
             emailMessage.Subject = message.Subject;
