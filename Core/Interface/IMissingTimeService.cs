@@ -9,6 +9,6 @@ public interface IMissingTimeService
     Task<IEnumerable<Time>> GetUsersTimePerWeek(DateTime startDate, DateTime endDate);
     Task<IEnumerable<Time>> GetWeeksTimePerUser(Guid userId, DateTime startDate, DateTime endDate);
     Task<IEnumerable<Time>> GetMissingTimeUsersPerTemplate(int templateId);
-    Task<string> GetCcContactEmailAddress(Guid ccContact);
+    Task<string> GetCcContactEmailAddress(string ccContact);
 }
 

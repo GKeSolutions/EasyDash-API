@@ -1,5 +1,6 @@
 ﻿using Core.Enum;
 using Core.Interface;
+using Core.Model.MissingTime;
 using Core.Model.Notification;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,7 +30,7 @@ namespace EasyDash_API.Controllers
             {
                 var info = await DashboardService.GetProcessInfoByProcId(processNotification.ProcessId);
                 var tags = BuildProcessTags(info.UserName, info.ProcessCaption, info.LastUpdated, info.ProcessItemId);
-                return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = info.UserEmail, CcContact = processNotification.CcContact, EventType = (int)EventType.ActionList, ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId }, tags);
+                return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = info.UserEmail, CcContact = processNotification.CcContact, EventType = (int)EventType.ActionList, ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId, ProcessDescription=info.ProcessCaption, ProcItemId=info.ProcessItemId, LastAccessTime=info.LastUpdated }, tags);
             }
             else if (processNotification.UserId != Guid.Empty)//User NotifyAll
             {
@@ -46,7 +47,10 @@ namespace EasyDash_API.Controllers
                                 CcContact = processNotification.CcContact,
                                 ProcessCode = process?.ProcessCode,
                                 EventType = (int)EventType.ActionList,
-                                UserId = processNotification.UserId
+                                UserId = processNotification.UserId,
+                                ProcessDescription = process.ProcessCaption,
+                                ProcItemId = process.ProcessItemId,
+                                LastAccessTime = process.LastUpdated
                             };
                             var tags = BuildProcessTags(process.UserName, process.ProcessCaption, process.LastUpdated, process.ProcessItemId);
                             await NotificationService.SendEmailNotification(notification, tags);
@@ -65,7 +69,10 @@ namespace EasyDash_API.Controllers
                         CcContact = processNotification.CcContact,
                         ProcessCode = processNotification.ProcessCode,
                         EventType = (int)EventType.ActionList,
-                        UserId = processItem.UserId
+                        UserId = processItem.UserId,
+                        ProcessDescription = processItem.ProcessCaption,
+                        ProcItemId = processItem.ProcessItemId,
+                        LastAccessTime = processItem.LastUpdated
                     };
                     var tags = BuildProcessTags(processItem.UserName, processItem.ProcessCaption, processItem.LastUpdated, processItem.ProcessItemId);
                     await NotificationService.SendEmailNotification(notification, tags);
@@ -90,6 +97,9 @@ namespace EasyDash_API.Controllers
                             CcContact = missingTimeNotification.CcContact,
                             EventType = (int)EventType.MissingTime,
                             UserId = missingTimeNotification.UserId,
+                            RequiredHours=missingTime.WeeklyHoursRequired,
+                            LoggedHours=missingTime.WorkHrs,
+                            MissingHours= missingTime.WeeklyHoursRequired - missingTime.WorkHrs,
                         };
                         var tags = BuildMissingTimeTags(missingTime.UserName, missingTimeNotification.StartDate, missingTime.WeeklyHoursRequired, missingTime.WorkHrs);
                         await NotificationService.SendEmailNotification(notification, tags);
@@ -108,6 +118,9 @@ namespace EasyDash_API.Controllers
                                 CcContact = missingTimeNotification.CcContact,
                                 EventType = (int)EventType.MissingTime,
                                 UserId = user.UserId,
+                                RequiredHours = user.WeeklyHoursRequired,
+                                LoggedHours = user.WorkHrs,
+                                MissingHours = user.WeeklyHoursRequired - user.WorkHrs,
                             };
                             var tags = BuildMissingTimeTags(user.UserName, missingTimeNotification.StartDate, user.WeeklyHoursRequired, user.WorkHrs);
                             await NotificationService.SendEmailNotification(notification, tags);
@@ -128,6 +141,9 @@ namespace EasyDash_API.Controllers
                             CcContact = missingTimeNotification.CcContact,
                             EventType = (int)EventType.MissingTime  ,
                             UserId = missingTimeNotification.UserId,
+                            RequiredHours = week.WeeklyHoursRequired,
+                            LoggedHours = week.WorkHrs,
+                            MissingHours = week.WeeklyHoursRequired - week.WorkHrs,
                         };
                         var tags = BuildMissingTimeTags(week.UserName, week.WeekStartDate, week.WeeklyHoursRequired, week.WorkHrs);
                         await NotificationService.SendEmailNotification(notification, tags);
