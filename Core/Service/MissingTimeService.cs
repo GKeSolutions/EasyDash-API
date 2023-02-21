@@ -85,7 +85,7 @@ namespace Core.Service
             return result;
         }
 
-        public async Task<string> GetCcContactEmailAddress(Guid ccContact)
+        public async Task<string> GetCcContactEmailAddress(string ccContact)
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
