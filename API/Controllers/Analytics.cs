@@ -17,15 +17,15 @@ namespace EasyDash_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<UserAnalytic>> user()
+        public async Task<IEnumerable<UserAnalytic>> user(DateTime startDate, DateTime endDate)
         {
-            return await AnalyticsService.GetAnalyticUsers();
+            return await AnalyticsService.GetAnalyticUsers(startDate, endDate);
         }
 
         [HttpGet]
-        public async Task<IEnumerable<ProcessAnalytic>> process()
+        public async Task<IEnumerable<ProcessAnalytic>> process(DateTime startDate, DateTime endDate)
         {
-            return await AnalyticsService.GetAnalyticProcesses();
+            return await AnalyticsService.GetAnalyticProcesses(startDate, endDate);
         }
 
         [HttpGet]
