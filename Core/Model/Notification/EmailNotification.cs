@@ -13,5 +13,11 @@
         public bool IsSystem { get; set; }
         public string TriggeredBy { get; set; }
         public int NotificationTemplateId { get; set; }
+        public string ProcessDescription { get; set; }
+        public Guid ProcItemId { get; set; }
+        public string LastAccessTime { get; set; }
+        public decimal RequiredHours { get; set; }
+        public decimal LoggedHours { get; set; }
+        public decimal MissingHours { get; set; }
     }
 }

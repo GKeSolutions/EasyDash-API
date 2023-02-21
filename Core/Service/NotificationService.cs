@@ -256,6 +256,13 @@ namespace Core.Service
                 EventType = emailNotification.EventType,
                 IsManual = emailNotification.IsManual,
                 IsReassign = emailNotification.IsReassign,
+                ProcessCode= emailNotification.ProcessCode,
+                ProcessDescription = emailNotification.ProcessDescription,
+                LastAccessTime = emailNotification.LastAccessTime,
+                LoggedHours = emailNotification.LoggedHours,
+                MissingHours = emailNotification.MissingHours,
+                ProcItemId = emailNotification.ProcItemId,
+                RequiredHours = emailNotification.RequiredHours,
                 IsSystem = isSystemJob,
                 ReassignTo = emailNotification.ReassignTo,
                 TriggeredBy = emailNotification.TriggeredBy
