@@ -39,14 +39,14 @@ namespace EasyDash_API
             //    options.FallbackPolicy = options.DefaultPolicy;
             //});
 
-            services.AddSingleton<IDashboardService, DashboardService>();
-            services.AddSingleton<ILookupService, LookupService>();
-            services.AddSingleton<IAnalyticsService, AnalyticsService>();
-            services.AddSingleton<INotificationService, NotificationService>();
-            services.AddSingleton<IScheduledNotificationService, ScheduledNotificationService>();
-            services.AddSingleton<ISchedulerService, SchedulerService>();
-            services.AddSingleton<IMissingTimeService, MissingTimeService>();
-            services.AddSingleton<IJobService, JobService>();
+            services.AddTransient<IDashboardService, DashboardService>();
+            services.AddTransient<ILookupService, LookupService>();
+            services.AddTransient<IAnalyticsService, AnalyticsService>();
+            services.AddTransient<INotificationService, NotificationService>();
+            services.AddTransient<IScheduledNotificationService, ScheduledNotificationService>();
+            services.AddTransient<ISchedulerService, SchedulerService>();
+            services.AddTransient<IMissingTimeService, MissingTimeService>();
+            services.AddTransient<IJobService, JobService>();
 
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
