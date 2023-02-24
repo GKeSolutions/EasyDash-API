@@ -1,5 +1,6 @@
 ﻿using Core.Interface;
 using Core.Model.Dashboard.Role;
+using Core.Model.Dashboard.User;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using System.Data.SqlClient;
@@ -23,11 +24,11 @@ namespace Core.Service
         }
 
         //GetAllUsersAndRoles
-        public async Task<IEnumerable<UserRole>> GetUsersRoles()
+        public async Task<IEnumerable<UsersRole>> GetUsersRoles()
         {
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
-            return await connection.QueryAsync<UserRole>("ed.GetAllUsersAndRoles");
+            return await connection.QueryAsync<UsersRole>("ed.GetAllUsersAndRoles");
         }
     }
 }

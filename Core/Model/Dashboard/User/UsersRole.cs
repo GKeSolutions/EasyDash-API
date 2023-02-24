@@ -1,6 +1,6 @@
 ﻿namespace Core.Model.Dashboard.User
 {
-    public class UserRole
+    public class UsersRole
     {
         public Guid NxBaseUserId { get; set; }
         public string BaseUserName { get; set; }
