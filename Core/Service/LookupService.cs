@@ -21,5 +21,13 @@ namespace Core.Service
             connection.Open();
             return await connection.QueryAsync<Role>("ed.GetRoles");
         }
+
+        //GetAllUsersAndRoles
+        public async Task<IEnumerable<UserRole>> GetUsersRoles()
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            return await connection.QueryAsync<UserRole>("ed.GetAllUsersAndRoles");
+        }
     }
 }

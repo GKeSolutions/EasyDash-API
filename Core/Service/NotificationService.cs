@@ -11,9 +11,14 @@ namespace Core.Service
     public class NotificationService : INotificationService
     {
         private IConfiguration Configuration;
+        private bool IsTestMode = true;
+        private string TestEmails;
+
         public NotificationService(IConfiguration configuration)
         {
             Configuration = configuration;
+            IsTestMode = Configuration["AppConfiguration:IsTestMode"] == "1";
+            TestEmails = Configuration["AppConfiguration:TestEmails"];
         }
         public async Task<IEnumerable<Model.Notification.Type>> GetType()
         {
@@ -249,7 +254,7 @@ namespace Core.Service
                 info = await GetNotificationInfo(emailNotification);
 
             if (info is null) return false; else info.TemplateBody = ReplaceTags(info.TemplateBody, emailNotification.EventType, tags);
-            var message = new Message(new string[] { emailNotification.EmailAddress }, emailNotification.CcContact is null ? null : new string[] { emailNotification.CcContact }, info.TemplateSubject, info.TemplateBody);
+            var message = new Message(new string[] { emailNotification.EmailAddress }, emailNotification.CcContact is null ? null : new string[] { emailNotification.CcContact }, info.TemplateSubject, info.TemplateBody, IsTestMode, TestEmails.Split(","));
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();

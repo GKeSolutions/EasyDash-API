@@ -47,6 +47,7 @@ namespace EasyDash_API
             services.AddSingleton<ISchedulerService, SchedulerService>();
             services.AddSingleton<IMissingTimeService, MissingTimeService>();
             services.AddSingleton<IJobService, JobService>();
+            services.AddSingleton<IReassignService, ReassignService>();
 
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)

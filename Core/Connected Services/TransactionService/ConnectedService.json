@@ -1,0 +1,36 @@
+{
+  "ExtendedData": {
+    "inputs": [
+      "C:/Users/JOE/Desktop/TransactionService.xml"
+    ],
+    "collectionTypes": [
+      "System.Array",
+      "System.Collections.Generic.Dictionary`2"
+    ],
+    "namespaceMappings": [
+      "*, TransactionService"
+    ],
+    "references": [
+      "BouncyCastle.Crypto, {Portable.BouncyCastle, 1.9.0}",
+      "D:\\Develop\\ED\\EasyDash-API\\Core\\bin\\Debug\\net6.0\\Notification.dll",
+      "Dapper, {Dapper, 2.0.123}",
+      "Hangfire.AspNetCore, {Hangfire.AspNetCore, 1.7.32}",
+      "Hangfire.Core, {Hangfire.Core, 1.7.32}",
+      "Hangfire.SqlServer, {Hangfire.SqlServer, 1.7.32}",
+      "MailKit, {MailKit, 3.2.0}",
+      "Microsoft.Extensions.Configuration.Abstractions, {Microsoft.Extensions.Configuration.Abstractions, 6.0.0}",
+      "Microsoft.Extensions.DependencyInjection, {Microsoft.Extensions.DependencyInjection, 6.0.0}",
+      "Microsoft.Extensions.DependencyInjection.Abstractions, {Microsoft.Extensions.DependencyInjection.Abstractions, 6.0.0}",
+      "Microsoft.Extensions.Primitives, {Microsoft.Extensions.Primitives, 6.0.0}",
+      "MimeKit, {MimeKit, 3.2.0}",
+      "NETCore.MailKit, {NETCore.MailKit, 2.1.0}",
+      "Newtonsoft.Json, {Newtonsoft.Json, 11.0.1}",
+      "System.Data.SqlClient, {System.Data.SqlClient, 4.8.3}",
+      "System.Formats.Asn1, {System.Formats.Asn1, 6.0.0}",
+      "System.Runtime.CompilerServices.Unsafe, {System.Runtime.CompilerServices.Unsafe, 6.0.0}",
+      "System.Security.Cryptography.Pkcs, {System.Security.Cryptography.Pkcs, 6.0.0}"
+    ],
+    "targetFramework": "net6.0",
+    "typeReuseMode": "All"
+  }
+}
