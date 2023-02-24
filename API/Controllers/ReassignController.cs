@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EasyDash_API.Controllers
 {
+    [ApiController]
+    [Route("[controller]/[action]")]
     public class ReassignController : ControllerBase
     {
         private readonly IReassignService ReassignService;
