@@ -1,11 +1,9 @@
-﻿using Core;
+﻿using API;
 using Core.Interface;
 using Core.Service;
 using Hangfire;
 using Hangfire.SqlServer;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using Notification;
 using System.Text.Json.Serialization;
 
@@ -69,8 +67,10 @@ namespace EasyDash_API
             services.AddHangfireServer();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            var path = Directory.GetCurrentDirectory();
+            loggerFactory.AddFile($"{path}\\Logs\\Log.txt");
             if (env.IsDevelopment())
             {
                 app.UseSwagger();

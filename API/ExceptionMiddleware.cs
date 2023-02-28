@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Net;
 
-namespace Core
+namespace API
 {
     public class ExceptionMiddleware
     {
