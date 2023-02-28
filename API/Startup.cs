@@ -1,7 +1,10 @@
-﻿using Core.Interface;
+﻿using Core;
+using Core.Interface;
 using Core.Service;
 using Hangfire;
 using Hangfire.SqlServer;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Notification;
 using System.Text.Json.Serialization;
@@ -48,6 +51,8 @@ namespace EasyDash_API
             services.AddTransient<IMissingTimeService, MissingTimeService>();
             services.AddTransient<IJobService, JobService>();
             services.AddTransient<IReassignService, ReassignService>();
+            services.TryAdd(ServiceDescriptor.Singleton<ILoggerFactory, LoggerFactory>());
+            services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<ExceptionMiddleware>), typeof(Logger<ExceptionMiddleware>)));
 
             services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
@@ -64,13 +69,14 @@ namespace EasyDash_API
             services.AddHangfireServer();
         }
 
-        public void Configure(IApplicationBuilder app, IBackgroundJobClient backgroundJobs, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseHttpsRedirection();
             app.UseRouting();
@@ -82,7 +88,6 @@ namespace EasyDash_API
                 endpoints.MapControllers();
             });
             app.UseHangfireDashboard("/hangfire");
-            //backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
         }
     }
 }

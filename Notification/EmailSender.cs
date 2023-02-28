@@ -1,11 +1,15 @@
-﻿using MailKit.Net.Smtp;
+﻿using MailKit;
+using MailKit.Net.Smtp;
+using Microsoft.Extensions.Logging;
 using MimeKit;
+using System.Net;
 
 namespace Notification
 {
     public class EmailSender
     {
         private readonly EmailConfiguration _emailConfig;
+
         public EmailSender(EmailConfiguration emailConfig)
         {
             _emailConfig = emailConfig;
@@ -18,6 +22,7 @@ namespace Notification
 
         private MimeMessage CreateEmailMessage(Message message)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress(_emailConfig.DisplayName, _emailConfig.From));
             emailMessage.To.AddRange(message.To);
@@ -30,23 +35,10 @@ namespace Notification
         {
             using (var client = new SmtpClient())
             {
-                try
-                {
-                    client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, true);
-                    client.AuthenticationMechanisms.Remove("XOAUTH2");
-                    client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
-                    client.Send(mailMessage);
-                }
-                catch
-                {
-                    //log an error message or throw an exception or both.
-                    throw;
-                }
-                finally
-                {
-                    client.Disconnect(true);
-                    client.Dispose();
-                }
+                client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, MailKit.Security.SecureSocketOptions.StartTls);
+                client.AuthenticationMechanisms.Remove("XOAUTH2");
+                client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
+                client.Send(mailMessage);
             }
         }
     }
