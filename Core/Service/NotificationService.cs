@@ -280,9 +280,7 @@ namespace Core.Service
                 TriggeredBy = emailNotification.TriggeredBy
             };
             await AddNotificationHistory(messageHistory);
-            emailSender.SendEmail(message);
-
-            return true;
+            return await emailSender.SendEmail(message);
         }
 
         private string ReplaceTags(string template, int eventType, Dictionary<string, string> tags)
