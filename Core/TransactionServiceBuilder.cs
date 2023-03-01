@@ -13,7 +13,7 @@ namespace Core
         {
             Api = new TransactionService.TransactionServiceClient();
             Configuration= configuration;
-            Api.Endpoint.Address = new System.ServiceModel.EndpointAddress(Configuration[""]);
+            Api.Endpoint.Address = new System.ServiceModel.EndpointAddress(Configuration["InstanceConfiguration:BaseUrl"]);
         }
 
         public async Task<string> Reassign(string processCode, Guid procItemId, Guid reassignToUserId)
