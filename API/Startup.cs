@@ -12,6 +12,8 @@ namespace EasyDash_API
     public class Startup
     {
         public IConfiguration Configuration { get; }
+        string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -19,14 +21,13 @@ namespace EasyDash_API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
             services.AddCors(options =>
             {
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:4200")
+                        policy.WithOrigins("http://3e-dev-wapi:5010").AllowCredentials().WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS").AllowAnyHeader()
                             .SetIsOriginAllowedToAllowWildcardSubdomains();
                     });
 
@@ -89,9 +90,9 @@ namespace EasyDash_API
                 app.UseSwaggerUI();
             }
             app.UseMiddleware<ExceptionMiddleware>();
-            app.UseCors(x => x.AllowCredentials().AllowAnyHeader().WithOrigins("http://localhost:4200"));
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseCors(MyAllowSpecificOrigins);
             app.UseAuthentication();
             app.UseAuthorization();
 
