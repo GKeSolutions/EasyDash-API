@@ -1,4 +1,5 @@
 ﻿using Core.Interface;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using ScheduledNotificationModel = Core.Model.Notification.ScheduledNotification;
 
@@ -6,6 +7,7 @@ namespace EasyDash_API.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]
+    [EnableCors("_myAllowSpecificOrigins")]
     public class ScheduledNotification : ControllerBase
     {
         private IScheduledNotificationService ScheduledNotificationService { get; set; }

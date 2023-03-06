@@ -3,6 +3,7 @@ using Core.Interface;
 using Core.Service;
 using Hangfire;
 using Hangfire.SqlServer;
+using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Notification;
 using System.Text.Json.Serialization;
@@ -12,6 +13,8 @@ namespace EasyDash_API
     public class Startup
     {
         public IConfiguration Configuration { get; }
+        public WebApplicationBuilder Builder { get; private set; }
+
         string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
         public Startup(IConfiguration configuration)
@@ -21,14 +24,19 @@ namespace EasyDash_API
 
         public void ConfigureServices(IServiceCollection services)
         {
+            Builder = WebApplication.CreateBuilder();
 
-            services.AddCors(options =>
+            Builder.Services.AddCors(options =>
             {
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                     policy =>
                     {
-                        policy.WithOrigins("http://3e-dev-wapi:5010").AllowCredentials().WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS").AllowAnyHeader()
-                            .SetIsOriginAllowedToAllowWildcardSubdomains();
+                        policy.WithOrigins("http://3e-dev-wapi:5010", "https://3e-dev-wapi:5010", "http://localhost:4200")
+                        .SetIsOriginAllowedToAllowWildcardSubdomains()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .SetPreflightMaxAge(TimeSpan.FromSeconds(3600));
                     });
 
             });
@@ -36,15 +44,15 @@ namespace EasyDash_API
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();
-            services.AddSingleton(emailConfig);
-            services.AddControllers().AddJsonOptions(options =>
+            Builder.Services.AddSingleton(emailConfig);
+            Builder.Services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                 //options.JsonSerializerOptions.PropertyNamingPolicy = null;
             });
 
-            services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+            Builder.Services.AddEndpointsApiExplorer();
+            Builder.Services.AddSwaggerGen();
             //builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
             //   .AddNegotiate();
 
@@ -53,19 +61,19 @@ namespace EasyDash_API
             //    options.FallbackPolicy = options.DefaultPolicy;
             //});
 
-            services.AddTransient<IDashboardService, DashboardService>();
-            services.AddTransient<ILookupService, LookupService>();
-            services.AddTransient<IAnalyticsService, AnalyticsService>();
-            services.AddTransient<INotificationService, NotificationService>();
-            services.AddTransient<IScheduledNotificationService, ScheduledNotificationService>();
-            services.AddTransient<ISchedulerService, SchedulerService>();
-            services.AddTransient<IMissingTimeService, MissingTimeService>();
-            services.AddTransient<IJobService, JobService>();
-            services.AddTransient<IReassignService, ReassignService>();
-            services.TryAdd(ServiceDescriptor.Singleton<ILoggerFactory, LoggerFactory>());
-            services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<ExceptionMiddleware>), typeof(Logger<ExceptionMiddleware>)));
+            Builder.Services.AddTransient<IDashboardService, DashboardService>();
+            Builder.Services.AddTransient<ILookupService, LookupService>();
+            Builder.Services.AddTransient<IAnalyticsService, AnalyticsService>();
+            Builder.Services.AddTransient<INotificationService, NotificationService>();
+            Builder.Services.AddTransient<IScheduledNotificationService, ScheduledNotificationService>();
+            Builder.Services.AddTransient<ISchedulerService, SchedulerService>();
+            Builder.Services.AddTransient<IMissingTimeService, MissingTimeService>();
+            Builder.Services.AddTransient<IJobService, JobService>();
+            Builder.Services.AddTransient<IReassignService, ReassignService>();
+            Builder.Services.TryAdd(ServiceDescriptor.Singleton<ILoggerFactory, LoggerFactory>());
+            Builder.Services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<ExceptionMiddleware>), typeof(Logger<ExceptionMiddleware>)));
 
-            services.AddHangfire(configuration => configuration
+            Builder.Services.AddHangfire(configuration => configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
@@ -77,30 +85,43 @@ namespace EasyDash_API
                     UseRecommendedIsolationLevel = true,
                     DisableGlobalLocks = true
                 }));
-            services.AddHangfireServer();
+            Builder.Services.AddHangfireServer();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            var application = Builder.Build();
             var path = Directory.GetCurrentDirectory();
             loggerFactory.AddFile($"{path}\\Logs\\Log.txt");
             if (env.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                application.UseSwagger();
+                application.UseSwaggerUI();
             }
-            app.UseMiddleware<ExceptionMiddleware>();
-            app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseCors(MyAllowSpecificOrigins);
-            app.UseAuthentication();
-            app.UseAuthorization();
+            application.UseMiddleware<ExceptionMiddleware>();
+            application.UseHttpsRedirection();
+            application.UseRouting();
+            application.UseCors(builder =>
+            {
+                builder
+                      .WithOrigins("http://3e-dev-wapi:5010", "https://3e-dev-wapi:5010", "http://localhost:4200")
+                      .SetIsOriginAllowedToAllowWildcardSubdomains()
+                      .AllowAnyHeader()
+                      .AllowCredentials()
+                      .WithMethods("GET", "PUT", "POST", "DELETE", "OPTIONS")
+                      .SetPreflightMaxAge(TimeSpan.FromSeconds(3600));
 
-            app.UseEndpoints(endpoints =>
+            });
+
+            application.UseAuthentication();
+            application.UseAuthorization();
+
+            application.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-            app.UseHangfireDashboard("/hangfire");
+            application.UseHangfireDashboard("/hangfire");
+            application.Run();
         }
     }
 }
