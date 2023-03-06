@@ -19,7 +19,19 @@ namespace EasyDash_API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors();
+            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:4200")
+                            .SetIsOriginAllowedToAllowWildcardSubdomains();
+                    });
+
+            });
+
             var emailConfig = Configuration
                 .GetSection("EmailConfiguration")
                 .Get<EmailConfiguration>();
@@ -77,7 +89,7 @@ namespace EasyDash_API
                 app.UseSwaggerUI();
             }
             app.UseMiddleware<ExceptionMiddleware>();
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseCors(x => x.AllowCredentials().AllowAnyHeader().WithOrigins("http://localhost:4200"));
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
