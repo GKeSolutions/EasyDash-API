@@ -2,6 +2,7 @@
 using Core.Model.Analytics;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Data.SqlClient;
 
 namespace Core.Service
@@ -9,25 +10,30 @@ namespace Core.Service
     public class AnalyticsService : IAnalyticsService
     {
         private IConfiguration Configuration;
+        private readonly ILogger<AnalyticsService> Logger;
 
-        public AnalyticsService(IConfiguration configuration)
+        public AnalyticsService(IConfiguration configuration, ILogger<AnalyticsService> logger)
         {
             Configuration = configuration;
+            Logger = logger;
         }
         public async Task<IEnumerable<UserAnalytic>> GetAnalyticUsers(DateTime startDate, DateTime endDate)
         {
+            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetAnalyticUsers)} {startDate} {endDate}");
             var analyticsData = await GetAnalyticsFromDb(startDate, endDate);
             return GroupByUser(analyticsData);
         }
 
         public async Task<IEnumerable<ProcessAnalytic>> GetAnalyticProcesses(DateTime startDate, DateTime endDate)
         {
+            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetAnalyticProcesses)} {startDate} {endDate}");
             var analyticsData = await GetAnalyticsFromDb(startDate, endDate);
             return GroupByProcess(analyticsData);
         }
 
         public async Task<IEnumerable<User>> GetAnalyticUserList()
         {
+            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetAnalyticUserList)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -41,6 +47,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<Process>> GetAnalyticProcessList()
         {
+            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetAnalyticProcessList)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();

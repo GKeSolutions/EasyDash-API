@@ -2,6 +2,7 @@
 using Core.Model.Notification;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Data.SqlClient;
 
 namespace Core.Service
@@ -10,16 +11,19 @@ namespace Core.Service
     {
         private IConfiguration Configuration;
         private IJobService JobService;
+        private readonly ILogger<ScheduledNotificationService> Logger;
 
-        public ScheduledNotificationService(IConfiguration configuration, IJobService jobService)
+        public ScheduledNotificationService(IConfiguration configuration, IJobService jobService, ILogger<ScheduledNotificationService> logger)
         {
             Configuration = configuration;
             JobService = jobService;
+            Logger = logger;
         }
 
         #region ScheduledNotification
         public async Task<IEnumerable<ScheduledNotification>> GetScheduledNotification()
         {
+            Logger.LogInformation($"{nameof(ScheduledNotificationService)} - {nameof(GetScheduledNotification)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<ScheduledNotification>("ed.GetScheduledNotification");
@@ -27,6 +31,7 @@ namespace Core.Service
 
         public async Task<ScheduledNotification> CreateScheduledNotification(ScheduledNotification scheduledNotification)
         {
+            Logger.LogInformation($"{nameof(ScheduledNotificationService)} - {nameof(CreateScheduledNotification)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -46,6 +51,7 @@ namespace Core.Service
 
         public async Task<ScheduledNotification> UpdateScheduledNotification(ScheduledNotification scheduledNotification)
         {
+            Logger.LogInformation($"{nameof(ScheduledNotificationService)} - {nameof(UpdateScheduledNotification)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -67,6 +73,7 @@ namespace Core.Service
 
         public async Task<int> DeleteScheduledNotification(int scheduledNotification)
         {
+            Logger.LogInformation($"{nameof(ScheduledNotificationService)} - {nameof(DeleteScheduledNotification)} {scheduledNotification}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();

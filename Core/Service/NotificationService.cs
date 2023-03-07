@@ -3,6 +3,7 @@ using Core.Interface;
 using Core.Model.Notification;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Notification;
 using System.Data.SqlClient;
 
@@ -13,15 +14,18 @@ namespace Core.Service
         private IConfiguration Configuration;
         private bool IsTestMode = true;
         private string TestEmails;
+        private readonly ILogger<NotificationService> Logger;
 
-        public NotificationService(IConfiguration configuration)
+        public NotificationService(IConfiguration configuration, ILogger<NotificationService> logger)
         {
             Configuration = configuration;
             IsTestMode = Configuration["AppConfiguration:IsTestMode"] == "1";
             TestEmails = Configuration["AppConfiguration:TestEmails"];
+            Logger = logger;
         }
         public async Task<IEnumerable<Model.Notification.Type>> GetType()
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetType)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<Model.Notification.Type>("ed.GeNotificationType");
@@ -30,6 +34,7 @@ namespace Core.Service
         #region Template
         public async Task<IEnumerable<Template>> GetTemplate()
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetTemplate)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<Template>("ed.GeNotificationTemplate");
@@ -37,6 +42,7 @@ namespace Core.Service
 
         public async Task<Template> CreateTemplate(Template template)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(CreateTemplate)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -56,6 +62,7 @@ namespace Core.Service
 
         public async Task<Template> UpdateTemplate(Template template)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(UpdateTemplate)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -76,6 +83,7 @@ namespace Core.Service
 
         public async Task<int> DeleteTemplate(int template)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(DeleteTemplate)} {template}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -90,6 +98,7 @@ namespace Core.Service
         #region ScheduledNotification
         public async Task<IEnumerable<ScheduledNotification>> GetScheduledNotification()
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetScheduledNotification)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<ScheduledNotification>("ed.GeNotificationScheduler");
@@ -97,6 +106,7 @@ namespace Core.Service
 
         public async Task<ScheduledNotification> CreateScheduledNotification(ScheduledNotification scheduledNotification)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(CreateScheduledNotification)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -114,6 +124,7 @@ namespace Core.Service
 
         public async Task<ScheduledNotification> UpdateScheduledNotification(ScheduledNotification scheduledNotification)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(UpdateScheduledNotification)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -132,6 +143,7 @@ namespace Core.Service
 
         public async Task<int> DeleteScheduledNotification(int scheduledNotification)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(DeleteScheduledNotification)} {scheduledNotification}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -146,6 +158,7 @@ namespace Core.Service
         #region Scheduler
         public async Task<IEnumerable<Scheduler>> GetScheduler()
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetScheduler)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<Scheduler>("ed.GeScheduler");
@@ -153,6 +166,7 @@ namespace Core.Service
 
         public async Task<Scheduler> CreateScheduler(Scheduler scheduler)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(CreateScheduler)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -166,6 +180,7 @@ namespace Core.Service
 
         public async Task<Scheduler> UpdateScheduler(Scheduler scheduler)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(UpdateScheduler)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -179,6 +194,7 @@ namespace Core.Service
 
         public async Task<int> DeleteScheduler(int scheduler)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(DeleteScheduler)} {scheduler}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -192,6 +208,7 @@ namespace Core.Service
 
         public async Task<NotificationInfo> GetNotificationInfo(EmailNotification notification)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetNotificationInfo)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -206,6 +223,7 @@ namespace Core.Service
 
         public async Task<NotificationInfo> GetNotificationTemplateInfo(int notificationTemplateId)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetNotificationTemplateInfo)} {notificationTemplateId}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -218,6 +236,7 @@ namespace Core.Service
 
         public async Task<int> AddNotificationHistory(MessageHistory message)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(AddNotificationHistory)}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -247,6 +266,7 @@ namespace Core.Service
 
         public async Task<MessageHistory> GetNotificationHistory(int actionType)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetNotificationHistory)} {actionType}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -260,6 +280,7 @@ namespace Core.Service
 
         public async Task<bool> SendEmailNotification(EmailNotification emailNotification, Dictionary<string, string> tags, bool isSystemJob=false)
         {
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(SendEmailNotification)}");
             NotificationInfo info;
             if (isSystemJob)
                 info = await GetNotificationTemplateInfo(emailNotification.NotificationTemplateId);

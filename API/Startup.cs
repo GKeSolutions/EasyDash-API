@@ -4,6 +4,7 @@ using Core.Service;
 using Hangfire;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Notification;
 using System.Text.Json.Serialization;
@@ -83,6 +84,10 @@ namespace EasyDash_API
                     DisableGlobalLocks = true
                 }));
             services.AddHangfireServer();
+            services.AddHttpLogging(options =>
+            {
+                options.LoggingFields = HttpLoggingFields.RequestMethod | HttpLoggingFields.RequestPath;
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
