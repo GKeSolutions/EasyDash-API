@@ -17,9 +17,10 @@ namespace EasyDash_API.Controllers
         }
 
         [HttpPost]
-        public async Task<string> Reassign([FromBody] ReassignModel model)
+        public async Task<IActionResult> Reassign([FromBody] ReassignModel model)
         {
-            return await ReassignService.Reassign(model.ProcessCode, model.ProcItemId, model.ReassignToUserId);
+            await ReassignService.Reassign(model.ProcessCode, model.ProcItemId, model.ReassignToUserId);
+            return Ok();
         }
     }
 }
