@@ -87,8 +87,9 @@ namespace EasyDash_API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseHttpLogging();
             var path = Directory.GetCurrentDirectory();
-            loggerFactory.AddFile($"C:\\Logs\\Log.txt");
+            loggerFactory.AddFile($"{path}\\Logs\\Log.txt");
             if (env.IsDevelopment())
             {
                 app.UseSwagger();
