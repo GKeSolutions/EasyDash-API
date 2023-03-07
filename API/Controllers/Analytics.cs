@@ -1,5 +1,6 @@
 ﻿using Core.Interface;
 using Core.Model.Analytics;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EasyDash_API.Controllers
@@ -7,6 +8,7 @@ namespace EasyDash_API.Controllers
     //[Authorize]
     [ApiController]
     [Route("[controller]/[Action]")]
+    [EnableCors("_myAllowSpecificOrigins")]
     public class Analytics : ControllerBase
     {
         public IAnalyticsService AnalyticsService { get; set; }

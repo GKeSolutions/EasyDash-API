@@ -2,12 +2,14 @@
 using Core.Interface;
 using Core.Model.MissingTime;
 using Core.Model.Notification;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EasyDash_API.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]
+    [EnableCors("_myAllowSpecificOrigins")]
     public class Notify : ControllerBase
     {
         private readonly INotificationService NotificationService;
