@@ -245,6 +245,19 @@ namespace Core.Service
 
         }
 
+        public async Task<MessageHistory> GetNotificationHistory(int actionType)
+        {
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                ActionType = actionType
+            });
+            return await connection.QueryFirstOrDefaultAsync<MessageHistory>("ed.GetNotificationHistory", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+
+        }
+
         public async Task<bool> SendEmailNotification(EmailNotification emailNotification, Dictionary<string, string> tags, bool isSystemJob=false)
         {
             NotificationInfo info;
