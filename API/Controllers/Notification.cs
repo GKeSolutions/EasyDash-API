@@ -45,5 +45,11 @@ namespace EasyDash_API.Controllers
         {
             return await NotificationService.DeleteTemplate(template);
         }
+
+        [HttpGet]
+        public async Task<MessageHistory> GetNotificationHistory(int actionType)
+        {
+            return await NotificationService.GetNotificationHistory(actionType);
+        }
     }
 }
