@@ -6,7 +6,6 @@ namespace EasyDash_API.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]
-    [EnableCors("_myAllowSpecificOrigins")]
     public class Lookup : ControllerBase
     {
         private ILookupService  LookupService{ get; set; }

@@ -105,17 +105,7 @@ namespace EasyDash_API
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors(builder =>
-            {
-                builder
-                      .WithOrigins("http://3e-dev-wapi:5010", "https://3e-dev-wapi:5010", "http://localhost:4200")
-                      .SetIsOriginAllowedToAllowWildcardSubdomains()
-                      .AllowAnyHeader()
-                      .AllowCredentials()
-                      .WithMethods("GET", "PUT", "POST", "DELETE", "OPTIONS")
-                      .SetPreflightMaxAge(TimeSpan.FromSeconds(3600));
-
-            });
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseEndpoints(endpoints =>
             {
