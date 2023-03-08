@@ -8,6 +8,7 @@ namespace EasyDash_API.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]
+    [EnableCors("_myAllowSpecificOrigins")]
     public class Notification : ControllerBase
     {
         private INotificationService NotificationService { get; set; }

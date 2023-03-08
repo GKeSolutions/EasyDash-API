@@ -7,6 +7,7 @@ namespace EasyDash_API.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]
+    [EnableCors("_myAllowSpecificOrigins")]
     public class ReassignController : ControllerBase
     {
         private readonly IReassignService ReassignService;

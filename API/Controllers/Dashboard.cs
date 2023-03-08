@@ -8,6 +8,7 @@ namespace API.Controllers
     //[Authorize]
     [ApiController]
     [Route("[controller]/[Action]")]
+    [EnableCors("_myAllowSpecificOrigins")]
     public class Dashboard : ControllerBase
     {
         private IDashboardService ProcessService { get; set; }
