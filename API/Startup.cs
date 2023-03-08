@@ -23,13 +23,13 @@ namespace EasyDash_API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
-                .AddNegotiate();
+            //services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+            //    .AddNegotiate();
 
-            services.AddAuthorization(options =>
-            {
-                options.FallbackPolicy = options.DefaultPolicy;
-            });
+            //services.AddAuthorization(options =>
+            //{
+            //    options.FallbackPolicy = options.DefaultPolicy;
+            //});
             services.AddCors(options =>
             {
                 options.AddPolicy(name: MyAllowSpecificOrigins,
