@@ -49,7 +49,7 @@ namespace EasyDash_API.Controllers
         }
 
         [HttpGet]
-        public async Task<MessageHistory> GetNotificationHistory(int actionType)
+        public async Task<IEnumerable<MessageHistory>> GetNotificationHistory(int actionType)
         {
             return await NotificationService.GetNotificationHistory(actionType);
         }

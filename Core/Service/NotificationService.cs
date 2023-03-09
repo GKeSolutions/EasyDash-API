@@ -264,7 +264,7 @@ namespace Core.Service
 
         }
 
-        public async Task<MessageHistory> GetNotificationHistory(int actionType)
+        public async Task<IEnumerable<MessageHistory>> GetNotificationHistory(int actionType)
         {
             Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetNotificationHistory)} {actionType}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
@@ -274,7 +274,7 @@ namespace Core.Service
             {
                 ActionType = actionType
             });
-            return await connection.QueryFirstOrDefaultAsync<MessageHistory>("ed.GetNotificationHistory", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            return await connection.QueryAsync<MessageHistory>("ed.GetNotificationHistory", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
 
         }
 
