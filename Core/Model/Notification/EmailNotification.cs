@@ -11,7 +11,7 @@
         public Guid ReassignTo { get; set; }
         public bool IsManual { get; set; }
         public bool IsSystem { get; set; }
-        public string TriggeredBy { get; set; }
+        public Guid TriggeredBy { get; set; }
         public int NotificationTemplateId { get; set; }
         public string ProcessDescription { get; set; }
         public Guid ProcItemId { get; set; }
