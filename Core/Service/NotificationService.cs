@@ -264,15 +264,20 @@ namespace Core.Service
 
         }
 
-        public async Task<MessageHistory> GetNotificationHistory(int actionType)
+        public async Task<MessageHistory> GetNotificationHistory(NotificationHistoryFilter filter)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetNotificationHistory)} {actionType}");
+            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetNotificationHistory)} {filter.ActionType}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
             {
-                ActionType = actionType
+                ActionType = filter.ActionType,
+                UserId = filter.UserId,
+                StartDate = filter.StartDate,
+                EndDate = filter.EndDate,
+                ProcessCode = filter.ProcessCode,
+                ProcItemId = filter.ProcItemId
             });
             return await connection.QueryFirstOrDefaultAsync<MessageHistory>("ed.GetNotificationHistory", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
 
