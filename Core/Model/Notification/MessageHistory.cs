@@ -20,6 +20,7 @@
         public bool IsSystem { get; set; }
         public string TriggeredBy { get; set; }
         public string UserName { get; set; }
+        public Guid UserId { get; set; }
         public DateTime openSince { get; set; }
     }
 }

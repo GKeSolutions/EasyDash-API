@@ -258,7 +258,8 @@ namespace Core.Service
                 message.MissingHours,
                 message.RequiredHours,
                 message.LoggedHours,
-                message.TriggeredBy
+                message.TriggeredBy,
+                message.UserId
             });
             return await connection.ExecuteAsync("ed.AddNotificationHistory", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
 
@@ -316,7 +317,8 @@ namespace Core.Service
                 RequiredHours = emailNotification.RequiredHours,
                 IsSystem = isSystemJob,
                 ReassignTo = emailNotification.ReassignTo,
-                TriggeredBy = emailNotification.TriggeredBy
+                TriggeredBy = emailNotification.TriggeredBy,
+                UserId = emailNotification.UserId,
             };
             await AddNotificationHistory(messageHistory);
             return await emailSender.SendEmail(message);
