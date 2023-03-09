@@ -34,5 +34,18 @@ namespace Core.Service
             connection.Open();
             return await connection.QueryAsync<UsersRole>("ed.GetAllUsersAndRoles");
         }
+
+        public async Task<Guid> GetUserIdByNetworkAlias(string networkAlias)
+        {
+            Logger.LogInformation($"{nameof(LookupService)} - {nameof(GetUsersRoles)}");
+            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                NetworkAlias=networkAlias
+            });
+            return await connection.QueryFirstOrDefaultAsync<Guid>("ed.GetUserIdByNetworkAlias", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+        }
     }
 }

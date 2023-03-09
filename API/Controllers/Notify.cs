@@ -15,13 +15,15 @@ namespace EasyDash_API.Controllers
         private readonly INotificationService NotificationService;
         private readonly IDashboardService DashboardService;
         private readonly IMissingTimeService MissingTimeService;
+        private readonly ILookupService LookupService;
         private readonly IConfiguration Configuration;
 
-        public Notify(INotificationService notificationService, IDashboardService dashboardService, IMissingTimeService missingTimeService, IConfiguration configuration)
+        public Notify(INotificationService notificationService, IDashboardService dashboardService, IMissingTimeService missingTimeService, ILookupService lookupService, IConfiguration configuration)
         {
             NotificationService = notificationService;
             DashboardService = dashboardService;
             MissingTimeService = missingTimeService;
+            LookupService = lookupService;
             Configuration = configuration;
         }
 
@@ -52,7 +54,8 @@ namespace EasyDash_API.Controllers
                                 UserId = processNotification.UserId,
                                 ProcessDescription = process.ProcessCaption,
                                 ProcItemId = process.ProcessItemId,
-                                LastAccessTime = process.LastUpdated
+                                LastAccessTime = process.LastUpdated,
+                                TriggeredBy = await LookupService.GetUserIdByNetworkAlias("")
                             };
                             var tags = BuildProcessTags(process.UserName, process.ProcessCaption, process.LastUpdated, process.ProcessItemId);
                             await NotificationService.SendEmailNotification(notification, tags);
@@ -74,7 +77,8 @@ namespace EasyDash_API.Controllers
                         UserId = processItem.UserId,
                         ProcessDescription = processItem.ProcessCaption,
                         ProcItemId = processItem.ProcessItemId,
-                        LastAccessTime = processItem.LastUpdated
+                        LastAccessTime = processItem.LastUpdated,
+                        TriggeredBy = await LookupService.GetUserIdByNetworkAlias("")
                     };
                     var tags = BuildProcessTags(processItem.UserName, processItem.ProcessCaption, processItem.LastUpdated, processItem.ProcessItemId);
                     await NotificationService.SendEmailNotification(notification, tags);
@@ -102,6 +106,7 @@ namespace EasyDash_API.Controllers
                             RequiredHours=missingTime.WeeklyHoursRequired,
                             LoggedHours=missingTime.WorkHrs,
                             MissingHours= missingTime.WeeklyHoursRequired - missingTime.WorkHrs,
+                            TriggeredBy = await LookupService.GetUserIdByNetworkAlias("")
                         };
                         var tags = BuildMissingTimeTags(missingTime.UserName, missingTimeNotification.StartDate, missingTime.WeeklyHoursRequired, missingTime.WorkHrs);
                         await NotificationService.SendEmailNotification(notification, tags);
@@ -123,6 +128,7 @@ namespace EasyDash_API.Controllers
                                 RequiredHours = user.WeeklyHoursRequired,
                                 LoggedHours = user.WorkHrs,
                                 MissingHours = user.WeeklyHoursRequired - user.WorkHrs,
+                                TriggeredBy = await LookupService.GetUserIdByNetworkAlias("")
                             };
                             var tags = BuildMissingTimeTags(user.UserName, missingTimeNotification.StartDate, user.WeeklyHoursRequired, user.WorkHrs);
                             await NotificationService.SendEmailNotification(notification, tags);
@@ -146,6 +152,7 @@ namespace EasyDash_API.Controllers
                             RequiredHours = week.WeeklyHoursRequired,
                             LoggedHours = week.WorkHrs,
                             MissingHours = week.WeeklyHoursRequired - week.WorkHrs,
+                            TriggeredBy = await LookupService.GetUserIdByNetworkAlias("")
                         };
                         var tags = BuildMissingTimeTags(week.UserName, week.WeekStartDate, week.WeeklyHoursRequired, week.WorkHrs);
                         await NotificationService.SendEmailNotification(notification, tags);

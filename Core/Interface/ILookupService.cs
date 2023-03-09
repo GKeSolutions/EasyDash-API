@@ -7,5 +7,6 @@ namespace Core.Interface
     {
         Task<IEnumerable<Role>> GetRoles();
         Task<IEnumerable<UsersRole>> GetUsersRoles();
+        Task<Guid> GetUserIdByNetworkAlias(string networkAlias);
     }
 }
