@@ -3,6 +3,7 @@ using Core.Interface;
 using Core.Service;
 using Hangfire;
 using Hangfire.SqlServer;
+using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Notification;
@@ -24,6 +25,13 @@ namespace EasyDash_API
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+                .AddNegotiate();
+
+            services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = options.DefaultPolicy;
+            });
             services.AddCors(options =>
             {
                 options.AddPolicy(name: MyAllowSpecificOrigins,
