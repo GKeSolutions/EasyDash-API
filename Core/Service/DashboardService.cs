@@ -87,7 +87,7 @@ namespace Core.Service
             return await connection.QueryAsync<ProcessResult>("ed.GetOpenProcessesPerTemplate", param: dparam, commandType: CommandType.StoredProcedure);
         }
 
-        public async Task<ProcessResult> GetProcessInfoByProcId(string processId)
+        public async Task<ProcessResult> GetProcessInfoByProcId(Guid processId)
         {
             Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetProcessInfoByProcId)} {processId}");
             var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);

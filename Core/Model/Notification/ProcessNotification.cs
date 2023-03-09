@@ -6,6 +6,6 @@
         public string EmailAddress { get; set; }
         public string CcContact { get; set; }
         public string ProcessCode { get; set; }
-        public string ProcessId { get; set; }
+        public Guid ProcessId { get; set; }
     }
 }

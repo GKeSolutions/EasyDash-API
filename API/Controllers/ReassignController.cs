@@ -8,10 +8,10 @@ namespace EasyDash_API.Controllers
     [ApiController]
     [Route("[controller]/[action]")]
     [EnableCors("_myAllowSpecificOrigins")]
-    public class ReassignController : ControllerBase
+    public class ReassignController : BaseController
     {
         private readonly IReassignService ReassignService;
-        public ReassignController(IReassignService reassignService)
+        public ReassignController(IReassignService reassignService, IHttpContextAccessor httpContextAccessor):base(httpContextAccessor)
         {
             ReassignService= reassignService;
         }
@@ -19,7 +19,7 @@ namespace EasyDash_API.Controllers
         [HttpPost]
         public async Task<IActionResult> Reassign([FromBody] ReassignModel model)
         {
-            await ReassignService.Reassign(model.ProcessCode, model.ProcItemId, model.ReassignToUserId);
+            await ReassignService.Reassign(model.ProcessCode, model.ProcItemId, model.ReassignToUserId, UserName);
             return Ok();
         }
     }
