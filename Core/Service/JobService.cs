@@ -53,7 +53,8 @@ namespace Core.Service
                         EmailAddress = user.UserEmail,
                         CcContact = await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact),
                         NotificationTemplateId = scheduledNotification.NotificationTemplate,
-                        EventType = (int)EventType.ActionList
+                        EventType = (int)EventType.ActionList,
+                        IsSystem = true,
                     };
                     var tags = BuildProcessTags(user.UserName, user.ProcessCaption, user.LastUpdated, user.ProcessItemId);
                     await NotificationService.SendEmailNotification(emailNotification, tags, true);
@@ -77,7 +78,8 @@ namespace Core.Service
                         EmailAddress = user.EmailAddress,
                         CcContact = await MissingTimeService.GetCcContactEmailAddress(scheduledNotification.CcContact),
                         NotificationTemplateId = scheduledNotification.NotificationTemplate,
-                        EventType = (int)EventType.MissingTime
+                        EventType = (int)EventType.MissingTime,
+                        IsSystem = true,
                     };
                     var tags = BuildMissingTimeTags(user.UserName, user.WeekStartDate, user.WeeklyHoursRequired, user.WorkHrs);
                     await NotificationService.SendEmailNotification(emailNotification, tags, true);
