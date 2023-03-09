@@ -11,7 +11,7 @@ public interface INotificationService
     Task<int> DeleteTemplate(int template);
     Task<NotificationInfo> GetNotificationInfo(EmailNotification notification);
     Task<int> AddNotificationHistory(MessageHistory messageHistory);
-    Task<MessageHistory> GetNotificationHistory(NotificationHistoryFilter filter);
+    Task<IEnumerable<MessageHistory>> GetNotificationHistory(NotificationHistoryFilter filter);
     Task<bool> SendEmailNotification(EmailNotification emailNotification, Dictionary<string, string> tags, bool isSystemJob = false);
     Task<NotificationInfo> GetNotificationTemplateInfo(int notificationTemplateId);
 }
