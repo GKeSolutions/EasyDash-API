@@ -34,7 +34,7 @@ namespace EasyDash_API.Controllers
             {
                 var info = await DashboardService.GetProcessInfoByProcId(processNotification.ProcessId);
                 var tags = BuildProcessTags(info.UserName, info.ProcessCaption, info.LastUpdated, info.ProcessItemId);
-                return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = info.UserEmail, CcContact = processNotification.CcContact, EventType = (int)EventType.ActionList, ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId, ProcessDescription=info.ProcessCaption, ProcItemId=info.ProcessItemId, LastAccessTime=info.LastUpdated }, tags);
+                return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = info.UserEmail, CcContact = processNotification.CcContact, EventType = (int)EventType.ActionList, ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId, ProcessDescription=info.ProcessCaption, ProcItemId=info.ProcessItemId, LastAccessTime=info.LastUpdated, TriggeredBy = await LookupService.GetUserIdByNetworkAlias("wilsonlegal\\gil.khoury"), IsManual=true }, tags);
             }
             else if (processNotification.UserId != Guid.Empty)//User NotifyAll
             {

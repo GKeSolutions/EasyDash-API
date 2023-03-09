@@ -1,5 +1,6 @@
 ﻿using Core.Interface;
 using Core.Model.Dashboard.Process;
+using EasyDash_API.Controllers;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,23 +10,21 @@ namespace API.Controllers
     [ApiController]
     [Route("[controller]/[Action]")]
     [EnableCors("_myAllowSpecificOrigins")]
-    public class Dashboard : ControllerBase
+    public class Dashboard : BaseController
     {
         private IDashboardService ProcessService { get; set; }
-        private readonly IHttpContextAccessor HttpContextAccessor;
         private readonly ILogger<Dashboard> Logger;
 
-        public Dashboard(IDashboardService processService, IHttpContextAccessor httpContextAccessor, ILogger<Dashboard> logger)
+        public Dashboard(IDashboardService processService, IHttpContextAccessor httpContextAccessor, ILogger<Dashboard> logger):base(httpContextAccessor)
         {
             ProcessService = processService;
-            HttpContextAccessor = httpContextAccessor;
             Logger = logger;
         }
 
         [HttpGet]
         public async Task<IEnumerable<Core.Model.Dashboard.User.DashUser>> user()
         {
-            Logger.LogError("The windows username:" + HttpContextAccessor.HttpContext.User.Identity.Name);
+            Logger.LogError("The windows username:" + UserName);
             return await ProcessService.GetUsers();
         }
 
