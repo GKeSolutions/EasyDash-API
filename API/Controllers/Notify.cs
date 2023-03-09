@@ -55,7 +55,7 @@ namespace EasyDash_API.Controllers
                                 ProcessDescription = process.ProcessCaption,
                                 ProcItemId = process.ProcessItemId,
                                 LastAccessTime = process.LastUpdated,
-                                TriggeredBy = await LookupService.GetUserIdByNetworkAlias(""),
+                                TriggeredBy = await LookupService.GetUserIdByNetworkAlias("wilsonlegal\\gil.khoury"),
                                 IsManual=true
                             };
                             var tags = BuildProcessTags(process.UserName, process.ProcessCaption, process.LastUpdated, process.ProcessItemId);
@@ -79,7 +79,7 @@ namespace EasyDash_API.Controllers
                         ProcessDescription = processItem.ProcessCaption,
                         ProcItemId = processItem.ProcessItemId,
                         LastAccessTime = processItem.LastUpdated,
-                        TriggeredBy = await LookupService.GetUserIdByNetworkAlias(""),
+                        TriggeredBy = await LookupService.GetUserIdByNetworkAlias("wilsonlegal\\gil.khoury"),
                         IsManual = true
                     };
                     var tags = BuildProcessTags(processItem.UserName, processItem.ProcessCaption, processItem.LastUpdated, processItem.ProcessItemId);
@@ -108,7 +108,7 @@ namespace EasyDash_API.Controllers
                             RequiredHours=missingTime.WeeklyHoursRequired,
                             LoggedHours=missingTime.WorkHrs,
                             MissingHours= missingTime.WeeklyHoursRequired - missingTime.WorkHrs,
-                            TriggeredBy = await LookupService.GetUserIdByNetworkAlias(""),
+                            TriggeredBy = await LookupService.GetUserIdByNetworkAlias("wilsonlegal\\gil.khoury"),
                             IsManual = true
                         };
                         var tags = BuildMissingTimeTags(missingTime.UserName, missingTimeNotification.StartDate, missingTime.WeeklyHoursRequired, missingTime.WorkHrs);
@@ -131,7 +131,7 @@ namespace EasyDash_API.Controllers
                                 RequiredHours = user.WeeklyHoursRequired,
                                 LoggedHours = user.WorkHrs,
                                 MissingHours = user.WeeklyHoursRequired - user.WorkHrs,
-                                TriggeredBy = await LookupService.GetUserIdByNetworkAlias(""),
+                                TriggeredBy = await LookupService.GetUserIdByNetworkAlias("wilsonlegal\\gil.khoury"),
                                 IsManual = true
                             };
                             var tags = BuildMissingTimeTags(user.UserName, missingTimeNotification.StartDate, user.WeeklyHoursRequired, user.WorkHrs);
@@ -156,7 +156,7 @@ namespace EasyDash_API.Controllers
                             RequiredHours = week.WeeklyHoursRequired,
                             LoggedHours = week.WorkHrs,
                             MissingHours = week.WeeklyHoursRequired - week.WorkHrs,
-                            TriggeredBy = await LookupService.GetUserIdByNetworkAlias(""),
+                            TriggeredBy = await LookupService.GetUserIdByNetworkAlias("wilsonlegal\\gil.khoury"),
                             IsManual = true
                         };
                         var tags = BuildMissingTimeTags(week.UserName, week.WeekStartDate, week.WeeklyHoursRequired, week.WorkHrs);
