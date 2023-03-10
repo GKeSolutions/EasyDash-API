@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Net;
+using System.Web.Http;
 
 namespace API
 {
@@ -47,7 +48,8 @@ namespace API
 
         private void SetResponseStatusCode()
         {
-            HttpResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
+            if(Exception is HttpResponseException) HttpResponse.StatusCode = (int)HttpStatusCode.Unauthorized;
+            else HttpResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
         }
 
         private void CreateApiErrorResponse()
