@@ -13,7 +13,7 @@ namespace EasyDash_API.Controllers
     {
         private INotificationService NotificationService { get; set; }
 
-        public Notification(INotificationService notificationService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        public Notification(INotificationService notificationService, ILookupService lookupService, IHttpContextAccessor httpContextAccessor) : base(lookupService, httpContextAccessor)
         {
             NotificationService = notificationService;
         }

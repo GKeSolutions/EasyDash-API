@@ -11,7 +11,7 @@ namespace EasyDash_API.Controllers
     public class ScheduledNotification : BaseController
     {
         private IScheduledNotificationService ScheduledNotificationService { get; set; }
-        public ScheduledNotification(IScheduledNotificationService sheduledNotificationService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        public ScheduledNotification(IScheduledNotificationService sheduledNotificationService, ILookupService lookupService, IHttpContextAccessor httpContextAccessor) : base(lookupService, httpContextAccessor)
         {
             ScheduledNotificationService = sheduledNotificationService;
         }

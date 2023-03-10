@@ -10,7 +10,7 @@ namespace EasyDash_API.Controllers
     public class MissingTime : BaseController
     {
         private IMissingTimeService MissingTimeService { get; set; }
-        public MissingTime(IMissingTimeService missingTimeService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        public MissingTime(IMissingTimeService missingTimeService, ILookupService lookupService, IHttpContextAccessor httpContextAccessor) : base(lookupService, httpContextAccessor)
         {
             MissingTimeService = missingTimeService;
         }

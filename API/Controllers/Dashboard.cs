@@ -15,7 +15,7 @@ namespace API.Controllers
         private IDashboardService ProcessService { get; set; }
         private readonly ILogger<Dashboard> Logger;
 
-        public Dashboard(IDashboardService processService, IHttpContextAccessor httpContextAccessor, ILogger<Dashboard> logger):base(httpContextAccessor)
+        public Dashboard(IDashboardService processService, IHttpContextAccessor httpContextAccessor, ILookupService lookupService, ILogger<Dashboard> logger):base(lookupService, httpContextAccessor)
         {
             ProcessService = processService;
             Logger = logger;

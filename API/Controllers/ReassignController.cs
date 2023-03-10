@@ -11,7 +11,7 @@ namespace EasyDash_API.Controllers
     public class ReassignController : BaseController
     {
         private readonly IReassignService ReassignService;
-        public ReassignController(IReassignService reassignService, IHttpContextAccessor httpContextAccessor):base(httpContextAccessor)
+        public ReassignController(IReassignService reassignService, ILookupService lookupService, IHttpContextAccessor httpContextAccessor):base(lookupService, httpContextAccessor)
         {
             ReassignService= reassignService;
         }

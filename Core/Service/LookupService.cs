@@ -52,5 +52,19 @@ namespace Core.Service
             });
             return await connection.QueryFirstOrDefaultAsync<Guid>("ed.GetUserIdByNetworkAlias", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
+
+        public bool GetIsActive3EUser(string networkAlias)
+        {
+            Logger.LogInformation($"{UserName} - {nameof(LookupService)} - {nameof(GetIsActive3EUser)}");
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                NetworkAlias = networkAlias
+            });
+            return connection.QueryFirstOrDefault<bool>("ed.GetIsActive3EUser", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+
+        }
     }
 }

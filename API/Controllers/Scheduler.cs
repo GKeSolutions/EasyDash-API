@@ -12,7 +12,7 @@ namespace EasyDash_API.Controllers
     public class Scheduler : BaseController
     {
         private ISchedulerService SchedulerService { get; set; }
-        public Scheduler(ISchedulerService schedulerService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        public Scheduler(ISchedulerService schedulerService, ILookupService lookupService, IHttpContextAccessor httpContextAccessor) : base(lookupService, httpContextAccessor)
         {
             SchedulerService = schedulerService;
         }

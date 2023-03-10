@@ -11,7 +11,7 @@ namespace EasyDash_API.Controllers
     {
         private ILookupService  LookupService{ get; set; }
 
-        public Lookup(ILookupService lookupService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        public Lookup(ILookupService lookupService, IHttpContextAccessor httpContextAccessor) : base(lookupService, httpContextAccessor)
         {
             LookupService = lookupService;
         }

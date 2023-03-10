@@ -13,7 +13,7 @@ namespace EasyDash_API.Controllers
     {
         public IAnalyticsService AnalyticsService { get; set; }
 
-        public Analytics(IAnalyticsService analyticsService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+        public Analytics(IAnalyticsService analyticsService, ILookupService lookupService, IHttpContextAccessor httpContextAccessor) : base(lookupService, httpContextAccessor)
         {
             AnalyticsService = analyticsService;
         }

@@ -18,7 +18,7 @@ namespace EasyDash_API.Controllers
         private readonly ILookupService LookupService;
         private readonly IConfiguration Configuration;
 
-        public Notify(INotificationService notificationService, IDashboardService dashboardService, IMissingTimeService missingTimeService, ILookupService lookupService, IHttpContextAccessor httpContextAccessor, IConfiguration configuration):base(httpContextAccessor)
+        public Notify(INotificationService notificationService, IDashboardService dashboardService, IMissingTimeService missingTimeService, ILookupService lookupService, IHttpContextAccessor httpContextAccessor, IConfiguration configuration):base(lookupService, httpContextAccessor)
         {
             NotificationService = notificationService;
             DashboardService = dashboardService;
