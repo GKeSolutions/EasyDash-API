@@ -48,7 +48,7 @@ namespace API
 
         private void SetResponseStatusCode()
         {
-            if(Exception is HttpResponseException) HttpResponse.StatusCode = (int)HttpStatusCode.Unauthorized;
+            if(Exception is HttpResponseException) HttpResponse.StatusCode = (int)HttpStatusCode.Forbidden;
             else HttpResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
         }
 
