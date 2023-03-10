@@ -21,7 +21,7 @@ namespace Core.Service
         public async Task<IEnumerable<MissingTime>> GetMissingTime(DateTime startDate, DateTime endDate)
         {
             Logger.LogInformation($"{nameof(MissingTimeService)} - {nameof(GetMissingTime)} {startDate} {endDate}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -36,7 +36,7 @@ namespace Core.Service
         public async Task<Time> GetTimePerUserPerWeek(Guid userId, DateTime startDate, DateTime endDate)
         {
             Logger.LogInformation($"{nameof(MissingTimeService)} - {nameof(GetTimePerUserPerWeek)} {userId} {startDate} {endDate}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -52,7 +52,7 @@ namespace Core.Service
         public async Task<IEnumerable<Time>> GetUsersTimePerWeek(DateTime startDate, DateTime endDate)
         {
             Logger.LogInformation($"{nameof(MissingTimeService)} - {nameof(GetUsersTimePerWeek)} {startDate} {endDate}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -67,7 +67,7 @@ namespace Core.Service
         public async Task<IEnumerable<Time>> GetWeeksTimePerUser(Guid userId, DateTime startDate, DateTime endDate)
         {
             Logger.LogInformation($"{nameof(MissingTimeService)} - {nameof(GetWeeksTimePerUser)} {userId} {startDate} {endDate}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -83,7 +83,7 @@ namespace Core.Service
         public async Task<IEnumerable<Time>> GetMissingTimeUsersPerTemplate(int templateId)
         {
             Logger.LogInformation($"{nameof(MissingTimeService)} - {nameof(GetMissingTimeUsersPerTemplate)} {templateId}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -97,7 +97,7 @@ namespace Core.Service
         public async Task<string> GetCcContactEmailAddress(string ccContact)
         {
             Logger.LogInformation($"{nameof(MissingTimeService)} - {nameof(GetCcContactEmailAddress)} {ccContact}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new

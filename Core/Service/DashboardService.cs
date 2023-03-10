@@ -77,7 +77,7 @@ namespace Core.Service
         public async Task<IEnumerable<ProcessResult>> GetOpenProcessesPerTemplate(int templateId)
         {
             Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetOpenProcessesPerTemplate)} {templateId}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -90,7 +90,7 @@ namespace Core.Service
         public async Task<ProcessResult> GetProcessInfoByProcId(Guid processId)
         {
             Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetProcessInfoByProcId)} {processId}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -102,14 +102,14 @@ namespace Core.Service
 
         private async Task<IEnumerable<ProcessResult>> GetProcessesFromDb()
         {
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<ProcessResult>("ed.GetProcesses");
         }
 
         private async Task<IEnumerable<ProcessResult>> GetProcessesByUserFromDb(Guid userId)
         {
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -121,7 +121,7 @@ namespace Core.Service
 
         private async Task<IEnumerable<ProcessResult>> GetProcessItemsByProcessCodeFromDb(string processCode)
         {
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -214,7 +214,7 @@ namespace Core.Service
                 users = usersTbl.AsTableValuedParameter("ed.IdListGui"),
             });
 
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<UserRole>(sql: "ed.GetUsersRoles", param: dparam, commandType: CommandType.StoredProcedure);
         }

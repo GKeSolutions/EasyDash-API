@@ -22,7 +22,7 @@ namespace Core.Service
         public async Task<IEnumerable<Scheduler>> GetScheduler()
         {
             Logger.LogInformation($"{nameof(SchedulerService)} - {nameof(GetScheduler)}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<Scheduler>("ed.GeScheduler");
         }
@@ -30,7 +30,7 @@ namespace Core.Service
         public async Task<Scheduler> CreateScheduler(Scheduler scheduler)
         {
             Logger.LogInformation($"{nameof(SchedulerService)} - {nameof(CreateScheduler)}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -44,7 +44,7 @@ namespace Core.Service
         public async Task<Scheduler> UpdateScheduler(Scheduler scheduler)
         {
             Logger.LogInformation($"{nameof(SchedulerService)} - {nameof(UpdateScheduler)}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -58,7 +58,7 @@ namespace Core.Service
         public async Task<int> DeleteScheduler(int scheduler)
         {
             Logger.LogInformation($"{nameof(SchedulerService)} - {nameof(DeleteScheduler)} {scheduler}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new

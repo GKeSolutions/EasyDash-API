@@ -24,7 +24,7 @@ namespace Core.Service
         public async Task<IEnumerable<ScheduledNotification>> GetScheduledNotification()
         {
             Logger.LogInformation($"{nameof(ScheduledNotificationService)} - {nameof(GetScheduledNotification)}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<ScheduledNotification>("ed.GetScheduledNotification");
         }
@@ -32,7 +32,7 @@ namespace Core.Service
         public async Task<ScheduledNotification> CreateScheduledNotification(ScheduledNotification scheduledNotification)
         {
             Logger.LogInformation($"{nameof(ScheduledNotificationService)} - {nameof(CreateScheduledNotification)}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -52,7 +52,7 @@ namespace Core.Service
         public async Task<ScheduledNotification> UpdateScheduledNotification(ScheduledNotification scheduledNotification)
         {
             Logger.LogInformation($"{nameof(ScheduledNotificationService)} - {nameof(UpdateScheduledNotification)}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -74,7 +74,7 @@ namespace Core.Service
         public async Task<int> DeleteScheduledNotification(int scheduledNotification)
         {
             Logger.LogInformation($"{nameof(ScheduledNotificationService)} - {nameof(DeleteScheduledNotification)} {scheduledNotification}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new

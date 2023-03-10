@@ -34,7 +34,7 @@ namespace Core.Service
         public async Task<IEnumerable<User>> GetAnalyticUserList()
         {
             Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetAnalyticUserList)}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -48,7 +48,7 @@ namespace Core.Service
         public async Task<IEnumerable<Process>> GetAnalyticProcessList()
         {
             Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetAnalyticProcessList)}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
@@ -61,7 +61,7 @@ namespace Core.Service
 
         private async Task<IEnumerable<Analytics>> GetAnalyticsFromDb(DateTime startDate, DateTime endDate)
         {
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new

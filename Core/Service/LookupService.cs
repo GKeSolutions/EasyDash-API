@@ -22,7 +22,7 @@ namespace Core.Service
         public async Task<IEnumerable<Role>> GetRoles()
         {
             Logger.LogInformation($"{nameof(LookupService)} - {nameof(GetRoles)}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<Role>("ed.GetRoles");
         }
@@ -30,7 +30,7 @@ namespace Core.Service
         public async Task<IEnumerable<UsersRole>> GetUsersRoles()
         {
             Logger.LogInformation($"{nameof(LookupService)} - {nameof(GetUsersRoles)}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<UsersRole>("ed.GetAllUsersAndRoles");
         }
@@ -38,7 +38,7 @@ namespace Core.Service
         public async Task<Guid> GetUserIdByNetworkAlias(string networkAlias)
         {
             Logger.LogInformation($"{nameof(LookupService)} - {nameof(GetUsersRoles)}");
-            var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
