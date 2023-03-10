@@ -43,7 +43,7 @@ namespace API
         {
             var result = JsonConvert.SerializeObject(new { message = Exception?.Message });
             Logger.LogError(result);
-            await HttpResponse.WriteAsync(result);
+            await HttpResponse.WriteAsync("Not an active 3E user");
         }
 
         private void SetResponseStatusCode()
