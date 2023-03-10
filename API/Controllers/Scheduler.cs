@@ -9,10 +9,10 @@ namespace EasyDash_API.Controllers
     [Route("[controller]/[action]")]
     [EnableCors("_myAllowSpecificOrigins")]
 
-    public class Scheduler : ControllerBase
+    public class Scheduler : BaseController
     {
         private ISchedulerService SchedulerService { get; set; }
-        public Scheduler(ISchedulerService schedulerService)
+        public Scheduler(ISchedulerService schedulerService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             SchedulerService = schedulerService;
         }

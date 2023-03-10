@@ -7,10 +7,10 @@ namespace EasyDash_API.Controllers
     [ApiController]
     [Route("[controller]/[action]")]
     [EnableCors("_myAllowSpecificOrigins")]
-    public class MissingTime : ControllerBase
+    public class MissingTime : BaseController
     {
         private IMissingTimeService MissingTimeService { get; set; }
-        public MissingTime(IMissingTimeService missingTimeService)
+        public MissingTime(IMissingTimeService missingTimeService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             MissingTimeService = missingTimeService;
         }

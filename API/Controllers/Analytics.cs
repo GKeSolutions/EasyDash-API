@@ -9,11 +9,11 @@ namespace EasyDash_API.Controllers
     [ApiController]
     [Route("[controller]/[Action]")]
     [EnableCors("_myAllowSpecificOrigins")]
-    public class Analytics : ControllerBase
+    public class Analytics : BaseController
     {
         public IAnalyticsService AnalyticsService { get; set; }
 
-        public Analytics(IAnalyticsService analyticsService)
+        public Analytics(IAnalyticsService analyticsService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             AnalyticsService = analyticsService;
         }

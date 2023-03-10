@@ -8,10 +8,10 @@ namespace EasyDash_API.Controllers
     [ApiController]
     [Route("[controller]/[action]")]
     [EnableCors("_myAllowSpecificOrigins")]
-    public class ScheduledNotification : ControllerBase
+    public class ScheduledNotification : BaseController
     {
         private IScheduledNotificationService ScheduledNotificationService { get; set; }
-        public ScheduledNotification(IScheduledNotificationService sheduledNotificationService)
+        public ScheduledNotification(IScheduledNotificationService sheduledNotificationService, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
             ScheduledNotificationService = sheduledNotificationService;
         }
