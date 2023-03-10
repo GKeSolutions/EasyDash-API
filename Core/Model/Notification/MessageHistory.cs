@@ -24,5 +24,6 @@
         public string UserName { get; set; }
         public Guid UserId { get; set; }
         public DateTime openSince { get; set; }
+        public DateTime NotificationDate { get; set; }
     }
 }
