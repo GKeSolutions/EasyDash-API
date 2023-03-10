@@ -2,6 +2,7 @@
 using Core.Interface;
 using Core.Model.Notification;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Notification;
@@ -15,17 +16,21 @@ namespace Core.Service
         private bool IsTestMode = true;
         private string TestEmails;
         private readonly ILogger<NotificationService> Logger;
+        private IHttpContextAccessor HttpContextAccessor;
+        private string UserName;
 
-        public NotificationService(IConfiguration configuration, ILogger<NotificationService> logger)
+        public NotificationService(IConfiguration configuration, ILogger<NotificationService> logger, IHttpContextAccessor httpContextAccessor)
         {
             Configuration = configuration;
             IsTestMode = Configuration["AppConfiguration:IsTestMode"] == "1";
             TestEmails = Configuration["AppConfiguration:TestEmails"];
             Logger = logger;
+            HttpContextAccessor = httpContextAccessor;
+            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
         }
         public async Task<IEnumerable<Model.Notification.Type>> GetType()
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetType)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(GetType)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<Model.Notification.Type>("ed.GeNotificationType");
@@ -34,7 +39,7 @@ namespace Core.Service
         #region Template
         public async Task<IEnumerable<Template>> GetTemplate()
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetTemplate)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(GetTemplate)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<Template>("ed.GeNotificationTemplate");
@@ -42,7 +47,7 @@ namespace Core.Service
 
         public async Task<Template> CreateTemplate(Template template)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(CreateTemplate)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(CreateTemplate)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -62,7 +67,7 @@ namespace Core.Service
 
         public async Task<Template> UpdateTemplate(Template template)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(UpdateTemplate)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(UpdateTemplate)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -83,7 +88,7 @@ namespace Core.Service
 
         public async Task<int> DeleteTemplate(int template)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(DeleteTemplate)} {template}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(DeleteTemplate)} {template}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -98,7 +103,7 @@ namespace Core.Service
         #region ScheduledNotification
         public async Task<IEnumerable<ScheduledNotification>> GetScheduledNotification()
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetScheduledNotification)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(GetScheduledNotification)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<ScheduledNotification>("ed.GeNotificationScheduler");
@@ -106,7 +111,7 @@ namespace Core.Service
 
         public async Task<ScheduledNotification> CreateScheduledNotification(ScheduledNotification scheduledNotification)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(CreateScheduledNotification)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(CreateScheduledNotification)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -124,7 +129,7 @@ namespace Core.Service
 
         public async Task<ScheduledNotification> UpdateScheduledNotification(ScheduledNotification scheduledNotification)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(UpdateScheduledNotification)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(UpdateScheduledNotification)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -143,7 +148,7 @@ namespace Core.Service
 
         public async Task<int> DeleteScheduledNotification(int scheduledNotification)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(DeleteScheduledNotification)} {scheduledNotification}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(DeleteScheduledNotification)} {scheduledNotification}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -158,7 +163,7 @@ namespace Core.Service
         #region Scheduler
         public async Task<IEnumerable<Scheduler>> GetScheduler()
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetScheduler)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(GetScheduler)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<Scheduler>("ed.GeScheduler");
@@ -166,7 +171,7 @@ namespace Core.Service
 
         public async Task<Scheduler> CreateScheduler(Scheduler scheduler)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(CreateScheduler)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(CreateScheduler)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -180,7 +185,7 @@ namespace Core.Service
 
         public async Task<Scheduler> UpdateScheduler(Scheduler scheduler)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(UpdateScheduler)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(UpdateScheduler)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -194,7 +199,7 @@ namespace Core.Service
 
         public async Task<int> DeleteScheduler(int scheduler)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(DeleteScheduler)} {scheduler}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(DeleteScheduler)} {scheduler}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -208,7 +213,7 @@ namespace Core.Service
 
         public async Task<NotificationInfo> GetNotificationInfo(EmailNotification notification)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetNotificationInfo)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(GetNotificationInfo)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -223,7 +228,7 @@ namespace Core.Service
 
         public async Task<NotificationInfo> GetNotificationTemplateInfo(int notificationTemplateId)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetNotificationTemplateInfo)} {notificationTemplateId}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(GetNotificationTemplateInfo)} {notificationTemplateId}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -236,7 +241,7 @@ namespace Core.Service
 
         public async Task<int> AddNotificationHistory(MessageHistory message)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(AddNotificationHistory)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(AddNotificationHistory)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -267,7 +272,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<MessageHistory>> GetNotificationHistory(NotificationHistoryFilter filter)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(GetNotificationHistory)} {filter.ActionType}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(GetNotificationHistory)} {filter.ActionType}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -286,7 +291,7 @@ namespace Core.Service
 
         public async Task<bool> SendEmailNotification(EmailNotification emailNotification, Dictionary<string, string> tags, bool isSystemJob=false)
         {
-            Logger.LogInformation($"{nameof(NotificationService)} - {nameof(SendEmailNotification)}");
+            Logger.LogInformation($"{UserName} - {nameof(NotificationService)} - {nameof(SendEmailNotification)}");
             NotificationInfo info;
             if (isSystemJob)
                 info = await GetNotificationTemplateInfo(emailNotification.NotificationTemplateId);

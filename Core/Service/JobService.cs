@@ -2,6 +2,7 @@
 using Core.Interface;
 using Core.Model.Notification;
 using Hangfire;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -13,19 +14,23 @@ namespace Core.Service
         private INotificationService NotificationService;
         private IDashboardService DashboardService;
         private readonly IConfiguration Configuration;
+        private IHttpContextAccessor HttpContextAccessor;
         private readonly ILogger<JobService> Logger;
+        private string UserName;
 
-        public JobService(IMissingTimeService missingTimeService, INotificationService notificationService, IDashboardService dashboardService, IConfiguration configuration , ILogger<JobService> logger) 
+        public JobService(IMissingTimeService missingTimeService, INotificationService notificationService, IDashboardService dashboardService, IConfiguration configuration , ILogger<JobService> logger, IHttpContextAccessor httpContextAccessor) 
         {
             MissingTimeService = missingTimeService;
             DashboardService= dashboardService;
             NotificationService= notificationService;
             Configuration = configuration;
+            HttpContextAccessor = httpContextAccessor;
             Logger = logger;
+            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
         }
         public bool AddJob(ScheduledNotification scheduledNotification)
         {
-            Logger.LogInformation($"{nameof(JobService)} - {nameof(AddJob)}");
+            Logger.LogInformation($"{UserName} - {nameof(JobService)} - {nameof(AddJob)}");
             if (scheduledNotification.EventType == (int)EventType.ActionList)
                 RecurringJob.AddOrUpdate(scheduledNotification.Id.ToString(), () => SendEmailActionList(scheduledNotification), scheduledNotification.CronExpression);
             else if (scheduledNotification.EventType == (int)EventType.MissingTime)
@@ -35,14 +40,14 @@ namespace Core.Service
 
         public bool DeleteJob(string jobId)
         {
-            Logger.LogInformation($"{nameof(JobService)} - {nameof(DeleteJob)} {jobId}");
+            Logger.LogInformation($"{UserName} - {nameof(JobService)} - {nameof(DeleteJob)} {jobId}");
             RecurringJob.RemoveIfExists(jobId);
             return true;
         }
 
         public async Task<string> SendEmailActionList(ScheduledNotification scheduledNotification)
         {
-            Logger.LogInformation($"{nameof(JobService)} - {nameof(SendEmailActionList)}");
+            Logger.LogInformation($"{UserName} - {nameof(JobService)} - {nameof(SendEmailActionList)}");
             var users = await DashboardService.GetOpenProcessesPerTemplate(scheduledNotification.NotificationTemplate);
             foreach (var user in users)
             {
@@ -67,7 +72,7 @@ namespace Core.Service
 
         public async Task<string> SendEmailMissingTime(ScheduledNotification scheduledNotification)
         {
-            Logger.LogInformation($"{nameof(JobService)} - {nameof(SendEmailMissingTime)}");
+            Logger.LogInformation($"{UserName} - {nameof(JobService)} - {nameof(SendEmailMissingTime)}");
             var users = await MissingTimeService.GetMissingTimeUsersPerTemplate(scheduledNotification.NotificationTemplate);
             foreach (var user in users)
             {

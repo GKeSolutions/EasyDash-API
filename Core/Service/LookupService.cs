@@ -2,6 +2,7 @@
 using Core.Model.Dashboard.Role;
 using Core.Model.Dashboard.User;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Data.SqlClient;
@@ -12,16 +13,20 @@ namespace Core.Service
     {
         private IConfiguration Configuration;
         private readonly ILogger<LookupService> Logger;
+        private IHttpContextAccessor HttpContextAccessor;
+        private string UserName;
 
-        public LookupService(IConfiguration configuration, ILogger<LookupService> logger)
+        public LookupService(IConfiguration configuration, ILogger<LookupService> logger, IHttpContextAccessor httpContextAccessor)
         {
             Configuration = configuration;
+            HttpContextAccessor = httpContextAccessor;
             Logger = logger;
+            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
         }
 
         public async Task<IEnumerable<Role>> GetRoles()
         {
-            Logger.LogInformation($"{nameof(LookupService)} - {nameof(GetRoles)}");
+            Logger.LogInformation($"{UserName} - {nameof(LookupService)} - {nameof(GetRoles)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<Role>("ed.GetRoles");
@@ -29,7 +34,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<UsersRole>> GetUsersRoles()
         {
-            Logger.LogInformation($"{nameof(LookupService)} - {nameof(GetUsersRoles)}");
+            Logger.LogInformation($"{UserName} - {nameof(LookupService)} - {nameof(GetUsersRoles)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<UsersRole>("ed.GetAllUsersAndRoles");
@@ -37,7 +42,7 @@ namespace Core.Service
 
         public async Task<Guid> GetUserIdByNetworkAlias(string networkAlias)
         {
-            Logger.LogInformation($"{nameof(LookupService)} - {nameof(GetUsersRoles)}");
+            Logger.LogInformation($"{UserName} - {nameof(LookupService)} - {nameof(GetUsersRoles)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();

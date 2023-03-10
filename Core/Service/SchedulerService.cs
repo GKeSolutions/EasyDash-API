@@ -1,6 +1,7 @@
 ﻿using Core.Interface;
 using Core.Model.Notification;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Data.SqlClient;
@@ -11,17 +12,21 @@ namespace Core.Service
     {
         private IConfiguration Configuration;
         private readonly ILogger<SchedulerService> Logger;
+        private IHttpContextAccessor HttpContextAccessor;
+        private string UserName;
 
-        public SchedulerService(IConfiguration configuration, ILogger<SchedulerService> logger)
+        public SchedulerService(IConfiguration configuration, ILogger<SchedulerService> logger, IHttpContextAccessor httpContextAccessor)
         {
             Configuration = configuration;
             Logger = logger;
+            HttpContextAccessor = httpContextAccessor;
+            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
         }
 
         #region Scheduler
         public async Task<IEnumerable<Scheduler>> GetScheduler()
         {
-            Logger.LogInformation($"{nameof(SchedulerService)} - {nameof(GetScheduler)}");
+            Logger.LogInformation($"{UserName} - {nameof(SchedulerService)} - {nameof(GetScheduler)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<Scheduler>("ed.GeScheduler");
@@ -29,7 +34,7 @@ namespace Core.Service
 
         public async Task<Scheduler> CreateScheduler(Scheduler scheduler)
         {
-            Logger.LogInformation($"{nameof(SchedulerService)} - {nameof(CreateScheduler)}");
+            Logger.LogInformation($"{UserName} - {nameof(SchedulerService)} - {nameof(CreateScheduler)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -43,7 +48,7 @@ namespace Core.Service
 
         public async Task<Scheduler> UpdateScheduler(Scheduler scheduler)
         {
-            Logger.LogInformation($"{nameof(SchedulerService)} - {nameof(UpdateScheduler)}");
+            Logger.LogInformation($"{UserName} - {nameof(SchedulerService)} - {nameof(UpdateScheduler)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -57,7 +62,7 @@ namespace Core.Service
 
         public async Task<int> DeleteScheduler(int scheduler)
         {
-            Logger.LogInformation($"{nameof(SchedulerService)} - {nameof(DeleteScheduler)} {scheduler}");
+            Logger.LogInformation($"{UserName} - {nameof(SchedulerService)} - {nameof(DeleteScheduler)} {scheduler}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();

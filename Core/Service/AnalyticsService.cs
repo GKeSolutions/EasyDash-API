@@ -1,6 +1,7 @@
 ﻿using Core.Interface;
 using Core.Model.Analytics;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Data.SqlClient;
@@ -10,30 +11,34 @@ namespace Core.Service
     public class AnalyticsService : IAnalyticsService
     {
         private IConfiguration Configuration;
+        private IHttpContextAccessor HttpContextAccessor;
         private readonly ILogger<AnalyticsService> Logger;
+        private string UserName;
 
-        public AnalyticsService(IConfiguration configuration, ILogger<AnalyticsService> logger)
+        public AnalyticsService(IConfiguration configuration, ILogger<AnalyticsService> logger, IHttpContextAccessor httpContextAccessor)
         {
             Configuration = configuration;
+            HttpContextAccessor = httpContextAccessor;
+            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
             Logger = logger;
         }
         public async Task<IEnumerable<UserAnalytic>> GetAnalyticUsers(DateTime startDate, DateTime endDate)
         {
-            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetAnalyticUsers)} {startDate} {endDate}");
+            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetAnalyticUsers)} {startDate} {endDate}");
             var analyticsData = await GetAnalyticsFromDb(startDate, endDate);
             return GroupByUser(analyticsData);
         }
 
         public async Task<IEnumerable<ProcessAnalytic>> GetAnalyticProcesses(DateTime startDate, DateTime endDate)
         {
-            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetAnalyticProcesses)} {startDate} {endDate}");
+            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetAnalyticProcesses)} {startDate} {endDate}");
             var analyticsData = await GetAnalyticsFromDb(startDate, endDate);
             return GroupByProcess(analyticsData);
         }
 
         public async Task<IEnumerable<User>> GetAnalyticUserList()
         {
-            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetAnalyticUserList)}");
+            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetAnalyticUserList)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -47,7 +52,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<Process>> GetAnalyticProcessList()
         {
-            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetAnalyticProcessList)}");
+            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetAnalyticProcessList)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();

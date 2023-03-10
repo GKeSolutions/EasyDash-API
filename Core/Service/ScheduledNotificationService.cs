@@ -1,6 +1,7 @@
 ﻿using Core.Interface;
 using Core.Model.Notification;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Data.SqlClient;
@@ -12,18 +13,22 @@ namespace Core.Service
         private IConfiguration Configuration;
         private IJobService JobService;
         private readonly ILogger<ScheduledNotificationService> Logger;
+        private IHttpContextAccessor HttpContextAccessor;
+        private string UserName;
 
-        public ScheduledNotificationService(IConfiguration configuration, IJobService jobService, ILogger<ScheduledNotificationService> logger)
+        public ScheduledNotificationService(IConfiguration configuration, IJobService jobService, ILogger<ScheduledNotificationService> logger, IHttpContextAccessor httpContextAccessor)
         {
             Configuration = configuration;
             JobService = jobService;
             Logger = logger;
+            HttpContextAccessor= httpContextAccessor;
+            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
         }
 
         #region ScheduledNotification
         public async Task<IEnumerable<ScheduledNotification>> GetScheduledNotification()
         {
-            Logger.LogInformation($"{nameof(ScheduledNotificationService)} - {nameof(GetScheduledNotification)}");
+            Logger.LogInformation($"{UserName} - {nameof(ScheduledNotificationService)} - {nameof(GetScheduledNotification)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             return await connection.QueryAsync<ScheduledNotification>("ed.GetScheduledNotification");
@@ -31,7 +36,7 @@ namespace Core.Service
 
         public async Task<ScheduledNotification> CreateScheduledNotification(ScheduledNotification scheduledNotification)
         {
-            Logger.LogInformation($"{nameof(ScheduledNotificationService)} - {nameof(CreateScheduledNotification)}");
+            Logger.LogInformation($"{UserName} - {nameof(ScheduledNotificationService)} - {nameof(CreateScheduledNotification)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -51,7 +56,7 @@ namespace Core.Service
 
         public async Task<ScheduledNotification> UpdateScheduledNotification(ScheduledNotification scheduledNotification)
         {
-            Logger.LogInformation($"{nameof(ScheduledNotificationService)} - {nameof(UpdateScheduledNotification)}");
+            Logger.LogInformation($"{UserName} - {nameof(ScheduledNotificationService)} - {nameof(UpdateScheduledNotification)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -73,7 +78,7 @@ namespace Core.Service
 
         public async Task<int> DeleteScheduledNotification(int scheduledNotification)
         {
-            Logger.LogInformation($"{nameof(ScheduledNotificationService)} - {nameof(DeleteScheduledNotification)} {scheduledNotification}");
+            Logger.LogInformation($"{UserName} - {nameof(ScheduledNotificationService)} - {nameof(DeleteScheduledNotification)} {scheduledNotification}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();

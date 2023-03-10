@@ -2,8 +2,8 @@
 using Core.Model.Dashboard.Process;
 using Core.Model.Dashboard.Role;
 using Core.Model.Dashboard.User;
-using Core.Model.Notification;
 using Dapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Data;
@@ -15,16 +15,20 @@ namespace Core.Service
     {
         private IConfiguration Configuration;
         private readonly ILogger<DashboardService> Logger;
+        private IHttpContextAccessor HttpContextAccessor;
+        private string UserName;
 
-        public DashboardService(IConfiguration configuration, ILogger<DashboardService> logger)
+        public DashboardService(IConfiguration configuration, ILogger<DashboardService> logger, IHttpContextAccessor httpContextAccessor)
         {
             Configuration = configuration;
             Logger = logger;
+            HttpContextAccessor = httpContextAccessor;
+            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
         }
 
         public async Task<IEnumerable<DashUser>> GetUsers()
         {
-            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetUsers)}");
+            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetUsers)}");
             var processes = await GetProcessesFromDb();
             var grouped = GroupByUser(processes);
             var distinctUsers = grouped.Select(x => x.UserId).Distinct();
@@ -34,7 +38,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<DashUser>> GetProcessItemsByProcessCode(string processCode)
         {
-            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetProcessItemsByProcessCode)} {processCode}");
+            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetProcessItemsByProcessCode)} {processCode}");
             var processes = await GetProcessItemsByProcessCodeFromDb(processCode);
             var grouped = GroupByUser(processes);
             var distinctUsers = grouped.Select(x => x.UserId).Distinct();
@@ -44,7 +48,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<DashProcess>> GetProcesses()
         {
-            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetProcesses)}");
+            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetProcesses)}");
             var processes = await GetProcessesFromDb();
             var grouped = GroupByProcess(processes);
             var distinctUsers = processes.Select(x => x.UserId).Distinct();
@@ -60,7 +64,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<DashProcess>> GetProcessesByUser(Guid userId)
         {
-            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetProcessesByUser)} {userId}");
+            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetProcessesByUser)} {userId}");
             var processes = await GetProcessesByUserFromDb(userId);
             var grouped = GroupByProcess(processes);
             var distinctUsers = processes.Select(x => x.UserId).Distinct();
@@ -76,7 +80,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<ProcessResult>> GetOpenProcessesPerTemplate(int templateId)
         {
-            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetOpenProcessesPerTemplate)} {templateId}");
+            Logger.LogInformation($"{UserName}  -  {nameof(DashboardService)}  -  {nameof(GetOpenProcessesPerTemplate)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -89,7 +93,7 @@ namespace Core.Service
 
         public async Task<ProcessResult> GetProcessInfoByProcId(Guid processId)
         {
-            Logger.LogInformation($"{nameof(DashboardService)} - {nameof(GetProcessInfoByProcId)} {processId}");
+            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetProcessInfoByProcId)} {processId}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
