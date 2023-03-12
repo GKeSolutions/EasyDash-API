@@ -26,7 +26,7 @@ namespace Core.Service
             TestEmails = Configuration["AppConfiguration:TestEmails"];
             Logger = logger;
             HttpContextAccessor = httpContextAccessor;
-            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
+            UserName = HttpContextAccessor?.HttpContext?.User?.Identity?.Name;
         }
         public async Task<IEnumerable<Model.Notification.Type>> GetType()
         {
