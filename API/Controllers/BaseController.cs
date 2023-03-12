@@ -29,7 +29,7 @@ namespace EasyDash_API.Controllers
 
         private bool HasResourceManagerRole()
         {
-            var roles = LookupService.GetRolesPerNetworkAlias("WILSONLEGAL\\sarjoun.najjar");
+            var roles = LookupService.GetRolesPerNetworkAlias(UserName);
             if(roles.Any(x => x.RoleName == "Resource Manager Role")) return true;
             throw new MissingResourceManagerRoleException();
         }
