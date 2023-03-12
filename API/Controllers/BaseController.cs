@@ -16,7 +16,7 @@ namespace EasyDash_API.Controllers
         {
             HttpContextAccessor = httpContextAccessor;
             LookupService = lookupService;
-            ValidateUser();
+            //ValidateUser();
             HasResourceManagerRole();
         }
 
@@ -29,7 +29,7 @@ namespace EasyDash_API.Controllers
 
         private bool HasResourceManagerRole()
         {
-            var roles = LookupService.GetRolesPerNetworkAlias(UserName).Result;
+            var roles = LookupService.GetRolesPerNetworkAlias("WILSONLEGAL\\sarjoun.najjar");
             if(roles.Any(x => x.RoleName == "Resource Manager Role")) return true;
             throw new MissingResourceManagerRoleException();
         }

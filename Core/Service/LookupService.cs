@@ -66,7 +66,7 @@ namespace Core.Service
             return connection.QueryFirstOrDefault<bool>("ed.GetIsActive3EUser", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
 
-        public async Task<IEnumerable<Role>> GetRolesPerNetworkAlias(string networkAlias)
+        public IEnumerable<Role> GetRolesPerNetworkAlias(string networkAlias)
         {
             Logger.LogInformation($"{UserName} - {nameof(LookupService)} - {nameof(GetRolesPerNetworkAlias)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
@@ -76,7 +76,7 @@ namespace Core.Service
             {
                 NetworkAlias = networkAlias
             });
-            return await connection.QueryAsync<Role>("ed.GetIsActive3EUser", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            return connection.Query<Role>("ed.GetRolesPerNetworkAlias", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
 
         }
     }
