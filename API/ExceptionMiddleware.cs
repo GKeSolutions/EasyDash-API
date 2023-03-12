@@ -47,6 +47,8 @@ namespace API
                 await HttpResponse.WriteAsync("Not a Resource Manager user.");
             if (Exception is InactiveUserException)
                 await HttpResponse.WriteAsync("Not an active 3E user.");
+            else
+                await HttpResponse.WriteAsync(result);
         }
 
         private void SetResponseStatusCode()
