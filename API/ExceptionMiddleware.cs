@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Core.Exception;
+using Newtonsoft.Json;
 using System.Net;
-using System.Web.Http;
 
 namespace API
 {
@@ -43,12 +43,15 @@ namespace API
         {
             var result = JsonConvert.SerializeObject(new { message = Exception?.Message });
             Logger.LogError(result);
-            await HttpResponse.WriteAsync("Not an active 3E user");
+            if (Exception is MissingResourceManagerRoleException)
+                await HttpResponse.WriteAsync("Not a Resource Manager user.");
+            if (Exception is InactiveUserException)
+                await HttpResponse.WriteAsync("Not an active 3E user.");
         }
 
         private void SetResponseStatusCode()
         {
-            if(Exception is HttpResponseException) HttpResponse.StatusCode = (int)HttpStatusCode.Forbidden;
+            if (Exception is MissingResourceManagerRoleException || Exception is InactiveUserException) HttpResponse.StatusCode = (int)HttpStatusCode.Forbidden;
             else HttpResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
         }
 

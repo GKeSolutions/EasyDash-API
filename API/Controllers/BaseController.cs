@@ -1,4 +1,5 @@
-﻿using Core.Interface;
+﻿using Core.Exception;
+using Core.Interface;
 using Core.Service;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -16,13 +17,21 @@ namespace EasyDash_API.Controllers
             HttpContextAccessor = httpContextAccessor;
             LookupService = lookupService;
             ValidateUser();
+            HasResourceManagerRole();
         }
 
         public string UserName { get { return HttpContextAccessor.HttpContext.User.Identity.Name; }  set { } }
 
-        public void ValidateUser() {
+        private void ValidateUser() {
             var valid = LookupService.GetIsActive3EUser(UserName);
-            if (!valid) throw new HttpResponseException(HttpStatusCode.Unauthorized);
+            if (!valid) throw new InactiveUserException();
+        }
+
+        private bool HasResourceManagerRole()
+        {
+            var roles = LookupService.GetRolesPerNetworkAlias(UserName).Result;
+            if(roles.Any(x => x.RoleName == "Resource Manager Role")) return true;
+            throw new MissingResourceManagerRoleException();
         }
     }
 }
