@@ -5,5 +5,6 @@
         public string ProcessCode { get; set; }
         public Guid ProcItemId { get; set; }
         public Guid ReassignToUserId { get; set; }
+        public Guid InitialUserId { get; set; }
     }
 }

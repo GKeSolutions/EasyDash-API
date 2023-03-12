@@ -1,5 +1,6 @@
 ﻿using Core.Interface;
 using Core.Model.Notification;
+using Core.Model.Reassign;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -27,7 +28,7 @@ namespace Core.Service
             UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
         }
 
-        public async Task<string> Reassign(string processCode, Guid procItemId, Guid reassignToUserId, string userName)
+        public async Task<string> Reassign(string processCode, Guid procItemId, Guid reassignToUserId)
         {
             Logger.LogInformation($"{UserName} - {nameof(ReassignService)} - {nameof(Reassign)} {processCode} {procItemId} {reassignToUserId}");
             var builder = new TransactionServiceBuilder(Configuration);
@@ -43,11 +44,33 @@ namespace Core.Service
                 ProcessDescription = info.ProcessDescription,
                 ProcItemId = procItemId,
                 LastAccessTime = info.LastUpdated,
-                TriggeredBy = await LookupService.GetUserIdByNetworkAlias(userName),
+                TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName),
                 UserId = info.UserId
             };
             await NotificationService.AddNotificationHistory(messageHistory);
             return await builder.Reassign(processCode, procItemId, reassignToUserId);
+        }
+
+        public async Task<string> ReassignAll(ReassignModel model)
+        {
+            if (model.ProcessCode != null) 
+            {
+                var processItems = await DashboardService.GetProcessItemsByProcessCode(model.ProcessCode);
+                foreach ( var processItem in processItems ) 
+                {
+                    return await Reassign(model.ProcessCode, processItem.ProcessItemId, model.ReassignToUserId);
+                }
+            }
+
+            if (model.InitialUserId != Guid.Empty)
+            {
+                var processes = await DashboardService.GetProcessesByUser(model.InitialUserId);
+                foreach (var process in processes)
+                {
+                    return await Reassign(process.ProcessCode, process.ProcessItemId, model.ReassignToUserId);
+                }
+            }
+            return string.Empty;
         }
     }
 }
