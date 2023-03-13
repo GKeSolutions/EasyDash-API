@@ -79,7 +79,7 @@ namespace Core.Service
             return connection.Query<Role>("ed.GetRolesPerNetworkAlias", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
 
-        public async Task<string> GetUserNameByNetworkAlias()
+        public async Task<string> GetUserNameByNetworkAlias(string networkAlias)
         {
             Logger.LogInformation($"{UserName} - {nameof(LookupService)} - {nameof(GetUserNameByNetworkAlias)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
@@ -87,7 +87,7 @@ namespace Core.Service
             var dparam = new DynamicParameters();
             dparam.AddDynamicParams(new
             {
-                NetworkAlias = UserName
+                NetworkAlias = networkAlias
             });
             return await connection.QueryFirstOrDefaultAsync<string>("ed.GetUserNameByNetworkAlias", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
