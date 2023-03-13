@@ -10,6 +10,6 @@ namespace Core.Interface
         Task<Guid> GetUserIdByNetworkAlias(string networkAlias);
         bool GetIsActive3EUser(string networkAlias);
         IEnumerable<Role> GetRolesPerNetworkAlias(string networkAlias);
-        Task<string> GetUserNameByNetworkAlias(string networkAlias);
+        Task<string> GetUserNameByNetworkAlias();
     }
 }
