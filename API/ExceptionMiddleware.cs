@@ -45,7 +45,7 @@ namespace API
             Logger.LogError(result);
             if (Exception is MissingResourceManagerRoleException)
                 await HttpResponse.WriteAsync("Not a Resource Manager user.");
-            if (Exception is InactiveUserException)
+            else if (Exception is InactiveUserException)
                 await HttpResponse.WriteAsync("Not an active 3E user.");
             else
                 await HttpResponse.WriteAsync(result);
