@@ -146,7 +146,8 @@ namespace Core.Service
                     UserId = g.First().UserId,
                     ProcessCaption = g.First().ProcessCaption,
                     Processes = GetProcessesFromGroup(g),
-                    LastUpdated = g.First().LastUpdated
+                    LastUpdated = g.First().LastUpdated,
+                    ProcessItemId=g.First().ProcessItemId
                 });
             return grouped;
         }
@@ -162,7 +163,8 @@ namespace Core.Service
                     ProcessCaption = g.First().ProcessCaption,
                     Users = GetUsersFromGroup(g),
                     UserName = g.First().UserName,
-                    LastUpdated= g.First().LastUpdated
+                    LastUpdated= g.First().LastUpdated,
+                    ProcessItemId = g.First().ProcessItemId,
                 }); ;
             return grouped;
         }
