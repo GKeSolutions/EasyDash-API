@@ -58,7 +58,7 @@ namespace Core.Service
                 var processItems = await DashboardService.GetProcessItemsByProcessCode(model.ProcessCode);
                 foreach ( var processItem in processItems ) 
                 {
-                    return await Reassign(model.ProcessCode, processItem.ProcessItemId, model.ReassignToUserId);
+                    await Reassign(model.ProcessCode, processItem.ProcessItemId, model.ReassignToUserId);
                 }
             }
 
@@ -67,7 +67,7 @@ namespace Core.Service
                 var processes = await DashboardService.GetProcessesByUser(model.InitialUserId);
                 foreach (var process in processes)
                 {
-                    return await Reassign(process.ProcessCode, process.ProcessItemId, model.ReassignToUserId);
+                    await Reassign(process.ProcessCode, process.ProcessItemId, model.ReassignToUserId);
                 }
             }
             return string.Empty;
