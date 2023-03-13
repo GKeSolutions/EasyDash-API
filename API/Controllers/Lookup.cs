@@ -27,5 +27,11 @@ namespace EasyDash_API.Controllers
         {
             return await LookupService.GetUsersRoles();
         }
+
+        [HttpGet]
+        public async Task<object> UserName()
+        {
+            return await LookupService.GetUserNameByNetworkAlias();
+        }
     }
 }

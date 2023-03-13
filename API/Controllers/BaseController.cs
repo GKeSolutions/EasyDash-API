@@ -16,7 +16,7 @@ namespace EasyDash_API.Controllers
         {
             HttpContextAccessor = httpContextAccessor;
             LookupService = lookupService;
-            //ValidateUser();
+            ValidateUser();
             HasResourceManagerRole();
         }
 

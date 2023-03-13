@@ -24,7 +24,6 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IEnumerable<Core.Model.Dashboard.User.DashUser>> user()
         {
-            Logger.LogError("The windows username:" + UserName);
             return await ProcessService.GetUsers();
         }
 

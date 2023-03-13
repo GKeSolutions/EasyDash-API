@@ -77,7 +77,19 @@ namespace Core.Service
                 NetworkAlias = networkAlias
             });
             return connection.Query<Role>("ed.GetRolesPerNetworkAlias", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+        }
 
+        public async Task<string> GetUserNameByNetworkAlias()
+        {
+            Logger.LogInformation($"{UserName} - {nameof(LookupService)} - {nameof(GetUserNameByNetworkAlias)}");
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                NetworkAlias = UserName
+            });
+            return await connection.QueryFirstOrDefaultAsync<string>("ed.GetUserNameByNetworkAlias", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
     }
 }
