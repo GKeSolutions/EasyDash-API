@@ -31,7 +31,7 @@ namespace EasyDash_API.Controllers
         [HttpGet]
         public async Task<object> UserName()
         {
-            return await LookupService.GetUserNameByNetworkAlias();
+            return new { Username = await LookupService.GetUserNameByNetworkAlias() };
         }
     }
 }
