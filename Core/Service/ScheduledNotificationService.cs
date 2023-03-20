@@ -22,7 +22,7 @@ namespace Core.Service
             JobService = jobService;
             Logger = logger;
             HttpContextAccessor= httpContextAccessor;
-            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
+            UserName = HttpContextAccessor?.HttpContext?.User?.Identity?.Name;
         }
 
         #region ScheduledNotification

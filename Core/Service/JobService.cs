@@ -28,7 +28,7 @@ namespace Core.Service
             Configuration = configuration;
             HttpContextAccessor = httpContextAccessor;
             Logger = logger;
-            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
+            UserName = HttpContextAccessor?.HttpContext?.User?.Identity?.Name;
         }
         public bool AddJob(ScheduledNotification scheduledNotification)
         {

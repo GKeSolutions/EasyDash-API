@@ -25,7 +25,7 @@ namespace Core.Service
             LookupService= lookupService;
             Logger= logger;
             HttpContextAccessor= httpContextAccessor;
-            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
+            UserName = HttpContextAccessor?.HttpContext?.User?.Identity?.Name;
         }
 
         public async Task<string> Reassign(string processCode, Guid procItemId, Guid reassignToUserId)

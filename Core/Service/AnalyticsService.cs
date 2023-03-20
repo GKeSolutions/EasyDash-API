@@ -19,7 +19,7 @@ namespace Core.Service
         {
             Configuration = configuration;
             HttpContextAccessor = httpContextAccessor;
-            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
+            UserName = HttpContextAccessor?.HttpContext?.User?.Identity?.Name;
             Logger = logger;
         }
         public async Task<IEnumerable<UserAnalytic>> GetAnalyticUsers(DateTime startDate, DateTime endDate)

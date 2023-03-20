@@ -29,7 +29,7 @@ namespace Core.Service
             Configuration = configuration;
             Logger = logger;
             HttpContextAccessor = httpContextAccessor;
-            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
+            UserName = HttpContextAccessor?.HttpContext?.User?.Identity?.Name;
         }
 
         public async Task<IEnumerable<DashUser>> GetUsers()

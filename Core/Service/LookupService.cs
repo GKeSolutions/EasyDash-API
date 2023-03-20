@@ -21,7 +21,7 @@ namespace Core.Service
             Configuration = configuration;
             HttpContextAccessor = httpContextAccessor;
             Logger = logger;
-            UserName = HttpContextAccessor.HttpContext.User.Identity.Name;
+            UserName = HttpContextAccessor?.HttpContext?.User?.Identity?.Name;
         }
 
         public async Task<IEnumerable<Role>> GetRoles()
