@@ -47,7 +47,8 @@ namespace Core.Service
                 Scheduler = scheduledNotification.Scheduler,
                 NotifyAfterDays = scheduledNotification.NotifyAfterDays,
                 ReassignTo = scheduledNotification.ReassignTo,
-                CcContact = scheduledNotification.CcContact
+                CcContact = scheduledNotification.CcContact,
+                IsCancelProcess = scheduledNotification.IsCancelProcess
             });
             var result = await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.CreateScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
             JobService.AddJob(result);
@@ -68,7 +69,8 @@ namespace Core.Service
                 scheduledNotification.Scheduler,
                 scheduledNotification.NotifyAfterDays,
                 scheduledNotification.ReassignTo,
-                scheduledNotification.CcContact
+                scheduledNotification.CcContact,
+                scheduledNotification.IsCancelProcess
             });
             var result = await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.UpdateScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
             JobService.DeleteJob(scheduledNotification.Id.ToString());

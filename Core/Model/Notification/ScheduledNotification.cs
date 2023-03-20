@@ -13,5 +13,6 @@ namespace Core.Model.Notification
         public int EventType { get; set; }
         public Guid ReassignTo { get; set; }
         public string CcContact { get; set; }
+        public bool IsCancelProcess { get; set; }
     }
 }

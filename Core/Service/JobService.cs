@@ -13,16 +13,18 @@ namespace Core.Service
         private IMissingTimeService MissingTimeService;
         private INotificationService NotificationService;
         private IDashboardService DashboardService;
+        private IReassignService ReassignService;
         private readonly IConfiguration Configuration;
         private IHttpContextAccessor HttpContextAccessor;
         private readonly ILogger<JobService> Logger;
         private string UserName;
 
-        public JobService(IMissingTimeService missingTimeService, INotificationService notificationService, IDashboardService dashboardService, IConfiguration configuration , ILogger<JobService> logger, IHttpContextAccessor httpContextAccessor) 
+        public JobService(IMissingTimeService missingTimeService, INotificationService notificationService, IDashboardService dashboardService, IReassignService reassignService, IConfiguration configuration , ILogger<JobService> logger, IHttpContextAccessor httpContextAccessor) 
         {
             MissingTimeService = missingTimeService;
             DashboardService= dashboardService;
             NotificationService= notificationService;
+            ReassignService= reassignService;
             Configuration = configuration;
             HttpContextAccessor = httpContextAccessor;
             Logger = logger;
@@ -32,7 +34,7 @@ namespace Core.Service
         {
             Logger.LogInformation($"{UserName} - {nameof(JobService)} - {nameof(AddJob)}");
             if (scheduledNotification.EventType == (int)EventType.ActionList)
-                RecurringJob.AddOrUpdate(scheduledNotification.Id.ToString(), () => SendEmailActionList(scheduledNotification), scheduledNotification.CronExpression);
+                RecurringJob.AddOrUpdate(scheduledNotification.Id.ToString(), () => ProcessAcctionList(scheduledNotification), scheduledNotification.CronExpression);
             else if (scheduledNotification.EventType == (int)EventType.MissingTime)
                 RecurringJob.AddOrUpdate(scheduledNotification.Id.ToString(), () => SendEmailMissingTime(scheduledNotification), scheduledNotification.CronExpression);
             return true;
@@ -45,9 +47,9 @@ namespace Core.Service
             return true;
         }
 
-        public async Task<string> SendEmailActionList(ScheduledNotification scheduledNotification)
+        public async Task<string> ProcessAcctionList(ScheduledNotification scheduledNotification)
         {
-            Logger.LogInformation($"{UserName} - {nameof(JobService)} - {nameof(SendEmailActionList)}");
+            Logger.LogInformation($"{UserName} - {nameof(JobService)} - {nameof(ProcessAcctionList)}");
             var users = await DashboardService.GetOpenProcessesPerTemplate(scheduledNotification.NotificationTemplate);
             foreach (var user in users)
             {
@@ -64,7 +66,10 @@ namespace Core.Service
                     var tags = BuildProcessTags(user.UserName, user.ProcessCaption, user.LastUpdated, user.ProcessItemId);
                     await NotificationService.SendEmailNotification(emailNotification, tags, true);
                 }
-
+                if (scheduledNotification.ReassignTo != Guid.Empty)
+                {
+                    await ReassignService.Reassign(user.ProcessCode, user.ProcessItemId, scheduledNotification.ReassignTo);
+                }
             }
 
             return string.Empty;

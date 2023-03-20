@@ -8,6 +8,7 @@
         public string Content { get; set; }
         public int EventType { get; set; }
         public bool IsReassign { get; set; }
+        public bool IsCancelProcess { get; set; }
         public Guid ReassignTo { get; set; }
         public string ReassignToStr { get; set; }
         public string ProcessCode { get; set; }

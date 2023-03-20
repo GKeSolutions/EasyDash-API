@@ -1,7 +1,9 @@
 ﻿using Core.Interface;
+using Core.Model.Dashboard;
 using Core.Model.Dashboard.Process;
 using Core.Model.Dashboard.Role;
 using Core.Model.Dashboard.User;
+using Core.Model.Notification;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -13,13 +15,17 @@ namespace Core.Service
 {
     public class DashboardService : IDashboardService
     {
+        private INotificationService NotificationService;
+        private ILookupService LookupService;
         private IConfiguration Configuration;
         private readonly ILogger<DashboardService> Logger;
         private IHttpContextAccessor HttpContextAccessor;
         private string UserName;
 
-        public DashboardService(IConfiguration configuration, ILogger<DashboardService> logger, IHttpContextAccessor httpContextAccessor)
+        public DashboardService(INotificationService notificationService, ILookupService lookupService, IConfiguration configuration, ILogger<DashboardService> logger, IHttpContextAccessor httpContextAccessor)
         {
+            NotificationService = notificationService;
+            LookupService = lookupService;
             Configuration = configuration;
             Logger = logger;
             HttpContextAccessor = httpContextAccessor;
@@ -102,6 +108,52 @@ namespace Core.Service
                 ProcessId=processId,
             });
             return await connection.QueryFirstOrDefaultAsync<ProcessResult>("ed.GetProcessInfoByProcId", param: dparam, commandType: CommandType.StoredProcedure);
+        }
+
+        public async Task<string> CancelProcess(string processCode, Guid procItemId)
+        {
+            Logger.LogInformation($"{UserName} - {nameof(ReassignService)} - {nameof(CancelProcess)} {processCode} {procItemId}");
+            var builder = new TransactionServiceBuilder(Configuration);
+            var info = await GetProcessInfoByProcId(procItemId);
+            var messageHistory = new MessageHistory
+            {
+                EventType = 1,
+                IsManual = true,
+                IsReassign = true,
+                IsCancelProcess = true,
+                IsSystem = false,
+                ProcessCode = processCode,
+                ProcessDescription = info.ProcessDescription,
+                ProcItemId = procItemId,
+                LastAccessTime = info.LastUpdated,
+                TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName),
+                UserId = info.UserId
+            };
+            await NotificationService.AddNotificationHistory(messageHistory);
+            return await builder.CancelProcess(processCode, procItemId);
+        }
+
+        public async Task<string> CancelProcesses(Cancel model)
+        {
+            Logger.LogInformation($"{UserName} - {nameof(ReassignService)} - {nameof(CancelProcesses)} {model.ProcessCode} {model.ProcItemId}");
+            if (model.ProcessCode != null)
+            {
+                var processItems = await GetProcessItemsByProcessCode(model.ProcessCode);
+                foreach (var processItem in processItems)
+                {
+                    await CancelProcess(model.ProcessCode, processItem.ProcessItemId);
+                }
+            }
+
+            if (model.UserId != Guid.Empty)
+            {
+                var processes = await GetProcessesByUser(model.UserId);
+                foreach (var process in processes)
+                {
+                    await CancelProcess(process.ProcessCode, process.ProcessItemId);
+                }
+            }
+            return string.Empty;
         }
 
         private async Task<IEnumerable<ProcessResult>> GetProcessesFromDb()

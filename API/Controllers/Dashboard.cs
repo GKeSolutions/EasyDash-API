@@ -1,4 +1,5 @@
 ﻿using Core.Interface;
+using Core.Model.Dashboard;
 using Core.Model.Dashboard.Process;
 using EasyDash_API.Controllers;
 using Microsoft.AspNetCore.Cors;
@@ -31,6 +32,20 @@ namespace API.Controllers
         public async Task<IEnumerable<DashProcess>> process()
         {
             return await ProcessService.GetProcesses();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Cancel([FromBody] Cancel model)
+        {
+            await ProcessService.CancelProcess(model.ProcessCode, model.ProcItemId);
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CancelAll([FromBody] Cancel model)
+        {
+            await ProcessService.CancelProcesses(model);
+            return Ok();
         }
     }
 }
