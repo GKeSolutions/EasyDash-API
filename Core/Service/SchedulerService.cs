@@ -10,13 +10,15 @@ namespace Core.Service
 {
     public class SchedulerService : ISchedulerService
     {
+        private readonly IJobService JobService;
         private IConfiguration Configuration;
         private readonly ILogger<SchedulerService> Logger;
         private IHttpContextAccessor HttpContextAccessor;
         private string UserName;
 
-        public SchedulerService(IConfiguration configuration, ILogger<SchedulerService> logger, IHttpContextAccessor httpContextAccessor)
+        public SchedulerService(IJobService jobService, IConfiguration configuration, ILogger<SchedulerService> logger, IHttpContextAccessor httpContextAccessor)
         {
+            JobService = jobService;
             Configuration = configuration;
             Logger = logger;
             HttpContextAccessor = httpContextAccessor;
@@ -57,7 +59,19 @@ namespace Core.Service
                 CronExpression = scheduler.CronExpression,
                 Description = scheduler.Description
             });
-            return await connection.QueryFirstOrDefaultAsync<Scheduler>("ed.UpdateScheduler", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+            var result = await connection.QueryFirstOrDefaultAsync<Scheduler>("ed.UpdateScheduler", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+
+            var linkedScheduledNotifications = await GetLinkedScheduledNotifications(scheduler.Id);
+            if (linkedScheduledNotifications.Count() > 0)
+            {
+                foreach (var scheduledNotification in linkedScheduledNotifications)
+                {
+                    JobService.DeleteJob(scheduledNotification.Id.ToString());
+                    if (scheduledNotification.IsActive) JobService.AddJob(scheduledNotification);
+                }
+            }
+
+            return result;
         }
 
         public async Task<int> DeleteScheduler(int scheduler)
@@ -71,6 +85,19 @@ namespace Core.Service
                 Id = scheduler
             });
             return await connection.ExecuteAsync("ed.DeleteScheduler", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
+        }
+
+        private async Task<IEnumerable<ScheduledNotification>> GetLinkedScheduledNotifications(int schedulerId)
+        {
+            Logger.LogInformation($"{UserName} - {nameof(SchedulerService)} - {nameof(UpdateScheduler)}");
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
+            connection.Open();
+            var dparam = new DynamicParameters();
+            dparam.AddDynamicParams(new
+            {
+                schedulerId
+            });
+            return await connection.QueryAsync<ScheduledNotification>("ed.IsSchedulerLinked", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
         }
         #endregion
     }

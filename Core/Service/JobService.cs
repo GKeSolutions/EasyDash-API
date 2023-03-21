@@ -63,7 +63,9 @@ namespace Core.Service
                         EventType = (int)EventType.ActionList,
                         IsSystem = true,
                         UserId = user.UserId,
-                        ProcItemId = user.ProcessItemId
+                        ProcItemId = user.ProcessItemId,
+                        ProcessCode = user.ProcessCode,
+                        ProcessDescription = user.ProcessDescription
                     };
                     var tags = BuildProcessTags(user.UserName, user.ProcessCaption, user.LastUpdated, user.ProcessItemId);
                     await NotificationService.SendEmailNotification(emailNotification, tags, true);

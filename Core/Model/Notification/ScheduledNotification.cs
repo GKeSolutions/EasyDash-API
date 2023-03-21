@@ -1,6 +1,4 @@
-﻿using Core.Enum;
-
-namespace Core.Model.Notification
+﻿namespace Core.Model.Notification
 {
     public class ScheduledNotification
     {
