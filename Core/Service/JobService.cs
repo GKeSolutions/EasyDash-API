@@ -65,7 +65,8 @@ namespace Core.Service
                         UserId = user.UserId,
                         ProcItemId = user.ProcessItemId,
                         ProcessCode = user.ProcessCode,
-                        ProcessDescription = user.ProcessDescription
+                        ProcessDescription = user.ProcessDescription,
+                        LastAccessTime = user.LastUpdated
                     };
                     var tags = BuildProcessTags(user.UserName, user.ProcessCaption, user.LastUpdated, user.ProcessItemId);
                     await NotificationService.SendEmailNotification(emailNotification, tags, true);
