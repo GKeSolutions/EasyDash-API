@@ -38,7 +38,7 @@ namespace Core.Service
                 EventType = 1,
                 IsManual = true,
                 IsReassign = true,
-                IsSystem = false,
+                IsSystem = isSystem,
                 ReassignTo = reassignToUserId,
                 ProcessCode = processCode,
                 ProcessDescription = info.ProcessDescription,
