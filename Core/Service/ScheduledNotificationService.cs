@@ -74,7 +74,7 @@ namespace Core.Service
             });
             var result = await connection.QueryFirstOrDefaultAsync<ScheduledNotification>("ed.UpdateScheduledNotification", param: dparam, commandType: System.Data.CommandType.StoredProcedure);
             JobService.DeleteJob(scheduledNotification.Id.ToString());
-            JobService.AddJob(result);
+            if (scheduledNotification.IsActive) JobService.AddJob(result);
             return result;
         }
 

@@ -62,13 +62,15 @@ namespace Core.Service
                         NotificationTemplateId = scheduledNotification.NotificationTemplate,
                         EventType = (int)EventType.ActionList,
                         IsSystem = true,
+                        UserId = user.UserId,
+                        ProcItemId = user.ProcessItemId
                     };
                     var tags = BuildProcessTags(user.UserName, user.ProcessCaption, user.LastUpdated, user.ProcessItemId);
                     await NotificationService.SendEmailNotification(emailNotification, tags, true);
                 }
                 if (scheduledNotification.ReassignTo != Guid.Empty)
                 {
-                    await ReassignService.Reassign(user.ProcessCode, user.ProcessItemId, scheduledNotification.ReassignTo);
+                    await ReassignService.Reassign(user.ProcessCode, user.ProcessItemId, scheduledNotification.ReassignTo, true);
                 }
             }
 
@@ -90,6 +92,7 @@ namespace Core.Service
                         NotificationTemplateId = scheduledNotification.NotificationTemplate,
                         EventType = (int)EventType.MissingTime,
                         IsSystem = true,
+                        UserId = user.UserId,
                     };
                     var tags = BuildMissingTimeTags(user.UserName, user.WeekStartDate, user.WeeklyHoursRequired, user.WorkHrs);
                     await NotificationService.SendEmailNotification(emailNotification, tags, true);

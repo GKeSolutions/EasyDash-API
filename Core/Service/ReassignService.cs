@@ -28,7 +28,7 @@ namespace Core.Service
             UserName = HttpContextAccessor?.HttpContext?.User?.Identity?.Name;
         }
 
-        public async Task<string> Reassign(string processCode, Guid procItemId, Guid reassignToUserId)
+        public async Task<string> Reassign(string processCode, Guid procItemId, Guid reassignToUserId, bool isSystem=false)
         {
             Logger.LogInformation($"{UserName} - {nameof(ReassignService)} - {nameof(Reassign)} {processCode} {procItemId} {reassignToUserId}");
             var builder = new TransactionServiceBuilder(Configuration);
@@ -44,7 +44,7 @@ namespace Core.Service
                 ProcessDescription = info.ProcessDescription,
                 ProcItemId = procItemId,
                 LastAccessTime = info.LastUpdated,
-                TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName),
+                TriggeredBy = isSystem ? null : await LookupService.GetUserIdByNetworkAlias(UserName),
                 UserId = info.UserId
             };
             await NotificationService.AddNotificationHistory(messageHistory);
