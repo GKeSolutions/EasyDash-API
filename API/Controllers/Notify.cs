@@ -72,7 +72,8 @@ namespace EasyDash_API.Controllers
             else if(processNotification.ProcessCode != null) //process notify all
             {
                 var atLeastOneEmailSent = false;
-                var processItems = await DashboardService.GetProcessItemsByProcessCode(processNotification.ProcessCode);
+                //var processItems = await DashboardService.GetProcessItemsByProcessCode(processNotification.ProcessCode);
+                var processItems = await DashboardService.GetProcessItemsByProcessCodeFromDb(processNotification.ProcessCode);
                 foreach (var processItem in processItems)
                 {
                     if (!string.IsNullOrEmpty(processItem.UserEmail)) //throw new Exception("User does not have valid email address.");
