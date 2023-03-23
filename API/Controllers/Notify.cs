@@ -1,5 +1,8 @@
 ﻿using Core.Enum;
 using Core.Interface;
+using Core.Model;
+using Core.Model.Analytics;
+using Core.Model.Dashboard.Process;
 using Core.Model.MissingTime;
 using Core.Model.Notification;
 using Microsoft.AspNetCore.Cors;
@@ -33,8 +36,9 @@ namespace EasyDash_API.Controllers
             if(processNotification.ProcessId != Guid.Empty)
             {
                 var info = await DashboardService.GetProcessInfoByProcId(processNotification.ProcessId);
+                if (string.IsNullOrEmpty(info.UserEmail)) throw new Exception("Missing email address.");
                 var tags = BuildProcessTags(info.UserName, info.ProcessCaption, info.LastUpdated, info.ProcessItemId);
-                return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = info.UserEmail, CcContact = processNotification.CcContact, EventType = (int)EventType.ActionList, ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId, ProcessDescription=info.ProcessCaption, ProcItemId=info.ProcessItemId, LastAccessTime=info.LastUpdated, TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName), IsManual=true }, tags);
+                return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = info.UserEmail, CcContact = processNotification.CcContact, EventType = (int)EventType.ActionList, ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId, ProcessDescription = info.ProcessCaption, ProcItemId = info.ProcessItemId, LastAccessTime = info.LastUpdated, TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName), IsManual = true }, tags);
             }
             else if (processNotification.UserId != Guid.Empty)//User NotifyAll
             {
@@ -43,7 +47,8 @@ namespace EasyDash_API.Controllers
                 {
                     if (process.Users != null || process?.Users?.Count != 0)
                     {
-                        if (!string.IsNullOrEmpty(process?.Users?.FirstOrDefault()?.UserEmail))
+                        if (string.IsNullOrEmpty(process?.Users?.FirstOrDefault()?.UserEmail)) throw new Exception("Missing email address.");
+                        else
                         {
                             var notification = new EmailNotification
                             {
@@ -66,25 +71,31 @@ namespace EasyDash_API.Controllers
             }
             else if(processNotification.ProcessCode != null) //process notify all
             {
+                var atLeastOneEmailSent = false;
                 var processItems = await DashboardService.GetProcessItemsByProcessCode(processNotification.ProcessCode);
                 foreach (var processItem in processItems)
                 {
-                    var notification = new EmailNotification
+                    if (!string.IsNullOrEmpty(processItem.UserEmail)) //throw new Exception("User does not have valid email address.");
                     {
-                        EmailAddress = processItem.UserEmail,
-                        CcContact = processNotification.CcContact,
-                        ProcessCode = processNotification.ProcessCode,
-                        EventType = (int)EventType.ActionList,
-                        UserId = processItem.UserId,
-                        ProcessDescription = processItem.ProcessCaption,
-                        ProcItemId = processItem.ProcessItemId,
-                        LastAccessTime = processItem.LastUpdated,
-                        TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName),
-                        IsManual = true
-                    };
-                    var tags = BuildProcessTags(processItem.UserName, processItem.ProcessCaption, processItem.LastUpdated, processItem.ProcessItemId);
-                    await NotificationService.SendEmailNotification(notification, tags);
+                        var notification = new EmailNotification
+                        {
+                            EmailAddress = processItem.UserEmail,
+                            CcContact = processNotification.CcContact,
+                            ProcessCode = processNotification.ProcessCode,
+                            EventType = (int)EventType.ActionList,
+                            UserId = processItem.UserId,
+                            ProcessDescription = processItem.ProcessCaption,
+                            ProcItemId = processItem.ProcessItemId,
+                            LastAccessTime = processItem.LastUpdated,
+                            TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName),
+                            IsManual = true
+                        };
+                        var tags = BuildProcessTags(processItem.UserName, processItem.ProcessCaption, processItem.LastUpdated, processItem.ProcessItemId);
+                        await NotificationService.SendEmailNotification(notification, tags);
+                        atLeastOneEmailSent = true;
+                    }
                 }
+                if(!atLeastOneEmailSent) throw new Exception("Missing email address.");
             }
             return true;
         }
@@ -92,12 +103,13 @@ namespace EasyDash_API.Controllers
         [HttpPost]
         public async Task<bool> MissingTime([FromBody] MissingTimeNotification missingTimeNotification)
         {
-                if (missingTimeNotification.IsOneWeek)
+            if (missingTimeNotification.IsOneWeek)
             {
                 if (missingTimeNotification.IsOneUser)
                 {
                     var missingTime = await MissingTimeService.GetTimePerUserPerWeek(missingTimeNotification.UserId, missingTimeNotification.StartDate, missingTimeNotification.EndDate);
-                    if (missingTime.WorkHrs < missingTime.WeeklyHoursRequired)
+                    if (string.IsNullOrEmpty(missingTime.EmailAddress)) throw new Exception("Missing email address.");
+                    else if (missingTime.WorkHrs < missingTime.WeeklyHoursRequired)
                     {
                         var notification = new EmailNotification
                         {
@@ -117,52 +129,64 @@ namespace EasyDash_API.Controllers
                 }
                 else
                 {
+                    var atLeastOneEmailSent = false;
                     var missingTimeUsers = await MissingTimeService.GetUsersTimePerWeek(missingTimeNotification.StartDate, missingTimeNotification.EndDate);
                     foreach (var user in missingTimeUsers)
                     {
-                        if (user.WorkHrs < user.WeeklyHoursRequired)
+                        if (!string.IsNullOrEmpty(user.EmailAddress))
                         {
-                            var notification = new EmailNotification
+                            if (user.WorkHrs < user.WeeklyHoursRequired)
                             {
-                                EmailAddress = user.EmailAddress,
-                                CcContact = missingTimeNotification.CcContact,
-                                EventType = (int)EventType.MissingTime,
-                                UserId = user.UserId,
-                                RequiredHours = user.WeeklyHoursRequired,
-                                LoggedHours = user.WorkHrs,
-                                MissingHours = user.WeeklyHoursRequired - user.WorkHrs,
-                                TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName),
-                                IsManual = true
-                            };
-                            var tags = BuildMissingTimeTags(user.UserName, missingTimeNotification.StartDate, user.WeeklyHoursRequired, user.WorkHrs);
-                            await NotificationService.SendEmailNotification(notification, tags);
+                                var notification = new EmailNotification
+                                {
+                                    EmailAddress = user.EmailAddress,
+                                    CcContact = missingTimeNotification.CcContact,
+                                    EventType = (int)EventType.MissingTime,
+                                    UserId = user.UserId,
+                                    RequiredHours = user.WeeklyHoursRequired,
+                                    LoggedHours = user.WorkHrs,
+                                    MissingHours = user.WeeklyHoursRequired - user.WorkHrs,
+                                    TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName),
+                                    IsManual = true
+                                };
+                                var tags = BuildMissingTimeTags(user.UserName, missingTimeNotification.StartDate, user.WeeklyHoursRequired, user.WorkHrs);
+                                await NotificationService.SendEmailNotification(notification, tags);
+                                atLeastOneEmailSent |= true;
+                            }
                         }
                     }
+                    if (!atLeastOneEmailSent) throw new Exception("Missing email address.");
                 }
             }
             else
             {
+                var atLeastOneEmailSent = false;
                 var weeks = await MissingTimeService.GetWeeksTimePerUser(missingTimeNotification.UserId, missingTimeNotification.StartDate, missingTimeNotification.EndDate);
                 foreach (var week in weeks)
                 {
-                    if (week.WorkHrs < week.WeeklyHoursRequired)
+                    if (!string.IsNullOrEmpty(week.EmailAddress))
                     {
-                        var notification = new EmailNotification
+                        if (week.WorkHrs < week.WeeklyHoursRequired)
                         {
-                            EmailAddress = week.EmailAddress,
-                            CcContact = missingTimeNotification.CcContact,
-                            EventType = (int)EventType.MissingTime  ,
-                            UserId = missingTimeNotification.UserId,
-                            RequiredHours = week.WeeklyHoursRequired,
-                            LoggedHours = week.WorkHrs,
-                            MissingHours = week.WeeklyHoursRequired - week.WorkHrs,
-                            TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName),
-                            IsManual = true
-                        };
-                        var tags = BuildMissingTimeTags(week.UserName, week.WeekStartDate, week.WeeklyHoursRequired, week.WorkHrs);
-                        await NotificationService.SendEmailNotification(notification, tags);
-                    }
+                            var notification = new EmailNotification
+                            {
+                                EmailAddress = week.EmailAddress,
+                                CcContact = missingTimeNotification.CcContact,
+                                EventType = (int)EventType.MissingTime,
+                                UserId = missingTimeNotification.UserId,
+                                RequiredHours = week.WeeklyHoursRequired,
+                                LoggedHours = week.WorkHrs,
+                                MissingHours = week.WeeklyHoursRequired - week.WorkHrs,
+                                TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName),
+                                IsManual = true
+                            };
+                            var tags = BuildMissingTimeTags(week.UserName, week.WeekStartDate, week.WeeklyHoursRequired, week.WorkHrs);
+                            await NotificationService.SendEmailNotification(notification, tags);
+                            atLeastOneEmailSent=true;
+                        }
+                    }   
                 }
+                if (!atLeastOneEmailSent) throw new Exception("Missing email address.");
             }
             return true;
         }
