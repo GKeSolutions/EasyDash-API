@@ -30,7 +30,7 @@ namespace EasyDash_API.Controllers
         [HttpPost]
         public async Task<bool> Process([FromBody] ProcessNotification processNotification)
         {
-            if(processNotification.ProcessId != null)
+            if(processNotification.ProcessId != Guid.Empty)
             {
                 var info = await DashboardService.GetProcessInfoByProcId(processNotification.ProcessId);
                 var tags = BuildProcessTags(info.UserName, info.ProcessCaption, info.LastUpdated, info.ProcessItemId);

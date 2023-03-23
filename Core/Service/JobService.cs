@@ -49,10 +49,15 @@ namespace Core.Service
 
         public async Task<string> ProcessAcctionList(ScheduledNotification scheduledNotification)
         {
-            Logger.LogInformation($"{UserName} - {nameof(JobService)} - {nameof(ProcessAcctionList)}");
+            Logger.LogInformation($"{nameof(JobService)} - {nameof(ProcessAcctionList)}");
             var users = await DashboardService.GetOpenProcessesPerTemplate(scheduledNotification.NotificationTemplate);
             foreach (var user in users)
             {
+                if (string.IsNullOrEmpty(user.UserEmail))
+                {
+                    Logger.LogInformation($"{nameof(JobService)} - {nameof(ProcessAcctionList)} - Skipped sending email to {user.UserId} - Missing Email Address");
+                    continue;
+                }
                 if (!string.IsNullOrEmpty(user.UserEmail))
                 {
                     var emailNotification = new EmailNotification
@@ -73,6 +78,7 @@ namespace Core.Service
                 }
                 if (scheduledNotification.ReassignTo != Guid.Empty)
                 {
+                    Logger.LogInformation($"{nameof(JobService)} - {nameof(ProcessAcctionList)} - Reassiging Process {user.ProcessItemId} with process code {user.ProcessCode} to user {scheduledNotification.ReassignTo}");
                     await ReassignService.Reassign(user.ProcessCode, user.ProcessItemId, scheduledNotification.ReassignTo, true);
                 }
             }
@@ -86,7 +92,7 @@ namespace Core.Service
             var users = await MissingTimeService.GetMissingTimeUsersPerTemplate(scheduledNotification.NotificationTemplate);
             foreach (var user in users)
             {
-                if (!string.IsNullOrEmpty(user.EmailAddress))
+                if (!string.IsNullOrEmpty(user.EmailAddress) || Configuration["AppConfiguration:IsTestMode"] == "1")
                 {
                     var emailNotification = new EmailNotification
                     {
