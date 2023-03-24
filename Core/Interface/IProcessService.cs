@@ -4,7 +4,7 @@ using Core.Model.Dashboard.User;
 
 namespace Core.Interface
 {
-    public interface IDashboardService
+    public interface IProcessService
     {
         Task<IEnumerable<DashUser>> GetUsers();
         Task<IEnumerable<DashProcess>> GetProcesses();
@@ -13,7 +13,5 @@ namespace Core.Interface
         Task<IEnumerable<ProcessResult>> GetProcessItemsByProcessCodeFromDb(string processCode);
         Task<IEnumerable<ProcessResult>> GetOpenProcessesPerTemplate(int templateId);
         Task<ProcessResult> GetProcessInfoByProcId(Guid processId);
-        Task<string> CancelProcess(string processCode, Guid procItemId);
-        Task<string> CancelProcesses(Cancel model);
     }
 }

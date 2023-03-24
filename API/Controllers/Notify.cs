@@ -1,9 +1,5 @@
 ﻿using Core.Enum;
 using Core.Interface;
-using Core.Model;
-using Core.Model.Analytics;
-using Core.Model.Dashboard.Process;
-using Core.Model.MissingTime;
 using Core.Model.Notification;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
@@ -16,15 +12,15 @@ namespace EasyDash_API.Controllers
     public class Notify : BaseController
     {
         private readonly INotificationService NotificationService;
-        private readonly IDashboardService DashboardService;
+        private readonly IProcessService ProcessService;
         private readonly IMissingTimeService MissingTimeService;
         private readonly ILookupService LookupService;
         private readonly IConfiguration Configuration;
 
-        public Notify(INotificationService notificationService, IDashboardService dashboardService, IMissingTimeService missingTimeService, ILookupService lookupService, IHttpContextAccessor httpContextAccessor, IConfiguration configuration):base(lookupService, httpContextAccessor)
+        public Notify(INotificationService notificationService, IProcessService processService, IMissingTimeService missingTimeService, ILookupService lookupService, IHttpContextAccessor httpContextAccessor, IConfiguration configuration):base(lookupService, httpContextAccessor)
         {
             NotificationService = notificationService;
-            DashboardService = dashboardService;
+            ProcessService = processService;
             MissingTimeService = missingTimeService;
             LookupService = lookupService;
             Configuration = configuration;
@@ -35,14 +31,15 @@ namespace EasyDash_API.Controllers
         {
             if(processNotification.ProcessId != Guid.Empty)
             {
-                var info = await DashboardService.GetProcessInfoByProcId(processNotification.ProcessId);
+                var info = await ProcessService.GetProcessInfoByProcId(processNotification.ProcessId);
+                if (info is null) throw new Exception("Process already complete");
                 if (string.IsNullOrEmpty(info.UserEmail)) throw new Exception("Missing email address.");
                 var tags = BuildProcessTags(info.UserName, info.ProcessCaption, info.LastUpdated, info.ProcessItemId);
                 return await NotificationService.SendEmailNotification(new EmailNotification { EmailAddress = info.UserEmail, CcContact = processNotification.CcContact, EventType = (int)EventType.ActionList, ProcessCode = processNotification.ProcessCode, UserId = processNotification.UserId, ProcessDescription = info.ProcessCaption, ProcItemId = info.ProcessItemId, LastAccessTime = info.LastUpdated, TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName), IsManual = true }, tags);
             }
             else if (processNotification.UserId != Guid.Empty)//User NotifyAll
             {
-                var processes = await DashboardService.GetProcessesByUser(processNotification.UserId);
+                var processes = await ProcessService.GetProcessesByUser(processNotification.UserId);
                 foreach (var process in processes)
                 {
                     if (process.Users != null || process?.Users?.Count != 0)
@@ -73,7 +70,7 @@ namespace EasyDash_API.Controllers
             {
                 var atLeastOneEmailSent = false;
                 //var processItems = await DashboardService.GetProcessItemsByProcessCode(processNotification.ProcessCode);
-                var processItems = await DashboardService.GetProcessItemsByProcessCodeFromDb(processNotification.ProcessCode);
+                var processItems = await ProcessService.GetProcessItemsByProcessCodeFromDb(processNotification.ProcessCode);
                 foreach (var processItem in processItems)
                 {
                     if (!string.IsNullOrEmpty(processItem.UserEmail)) //throw new Exception("User does not have valid email address.");

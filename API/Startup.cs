@@ -14,8 +14,6 @@ namespace EasyDash_API
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        //public WebApplicationBuilder Builder { get; private set; }
-
         string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
         public Startup(IConfiguration configuration)
@@ -58,15 +56,8 @@ namespace EasyDash_API
 
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
-            //builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
-            //   .AddNegotiate();
 
-            //builder.Services.AddAuthorization(options =>
-            //{
-            //    options.FallbackPolicy = options.DefaultPolicy;
-            //});
-
-            services.AddTransient<IDashboardService, DashboardService>();
+            services.AddTransient<IProcessService, ProcessService>();
             services.AddTransient<ILookupService, LookupService>();
             services.AddTransient<IAnalyticsService, AnalyticsService>();
             services.AddTransient<INotificationService, NotificationService>();
@@ -75,6 +66,7 @@ namespace EasyDash_API
             services.AddTransient<IMissingTimeService, MissingTimeService>();
             services.AddTransient<IJobService, JobService>();
             services.AddTransient<IReassignService, ReassignService>();
+            services.AddTransient<ICancelService, CancelService>();
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
             services.TryAdd(ServiceDescriptor.Singleton<ILoggerFactory, LoggerFactory>());
             services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<ExceptionMiddleware>), typeof(Logger<ExceptionMiddleware>)));
@@ -100,7 +92,6 @@ namespace EasyDash_API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            //var application = Builder.Build();
             var path = Directory.GetCurrentDirectory();
             loggerFactory.AddFile($"{path}\\Logs\\Log.txt");
             if (env.IsDevelopment())
@@ -131,7 +122,6 @@ namespace EasyDash_API
                 endpoints.MapControllers();
             });
             app.UseHangfireDashboard("/hangfire");
-            //application.Run();
         }
     }
 }

@@ -24,21 +24,21 @@ namespace Core.Service
         }
         public async Task<IEnumerable<UserAnalytic>> GetAnalyticUsers(DateTime startDate, DateTime endDate)
         {
-            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetAnalyticUsers)} {startDate} {endDate}");
+            Logger.LogInformation($"{UserName} - {nameof(ProcessService)} - {nameof(GetAnalyticUsers)} {startDate} {endDate}");
             var analyticsData = await GetAnalyticsFromDb(startDate, endDate);
             return GroupByUser(analyticsData);
         }
 
         public async Task<IEnumerable<ProcessAnalytic>> GetAnalyticProcesses(DateTime startDate, DateTime endDate)
         {
-            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetAnalyticProcesses)} {startDate} {endDate}");
+            Logger.LogInformation($"{UserName} - {nameof(ProcessService)} - {nameof(GetAnalyticProcesses)} {startDate} {endDate}");
             var analyticsData = await GetAnalyticsFromDb(startDate, endDate);
             return GroupByProcess(analyticsData);
         }
 
         public async Task<IEnumerable<User>> GetAnalyticUserList()
         {
-            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetAnalyticUserList)}");
+            Logger.LogInformation($"{UserName} - {nameof(ProcessService)} - {nameof(GetAnalyticUserList)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -52,7 +52,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<Process>> GetAnalyticProcessList()
         {
-            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetAnalyticProcessList)}");
+            Logger.LogInformation($"{UserName} - {nameof(ProcessService)} - {nameof(GetAnalyticProcessList)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();

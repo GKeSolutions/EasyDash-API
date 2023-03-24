@@ -12,17 +12,17 @@ namespace Core.Service
     {
         private IMissingTimeService MissingTimeService;
         private INotificationService NotificationService;
-        private IDashboardService DashboardService;
+        private IProcessService ProcessService;
         private IReassignService ReassignService;
         private readonly IConfiguration Configuration;
         private IHttpContextAccessor HttpContextAccessor;
         private readonly ILogger<JobService> Logger;
         private string UserName;
 
-        public JobService(IMissingTimeService missingTimeService, INotificationService notificationService, IDashboardService dashboardService, IReassignService reassignService, IConfiguration configuration , ILogger<JobService> logger, IHttpContextAccessor httpContextAccessor) 
+        public JobService(IMissingTimeService missingTimeService, INotificationService notificationService, IProcessService processService, IReassignService reassignService, IConfiguration configuration , ILogger<JobService> logger, IHttpContextAccessor httpContextAccessor) 
         {
             MissingTimeService = missingTimeService;
-            DashboardService= dashboardService;
+            ProcessService = processService;
             NotificationService= notificationService;
             ReassignService= reassignService;
             Configuration = configuration;
@@ -50,7 +50,7 @@ namespace Core.Service
         public async Task<string> ProcessAcctionList(ScheduledNotification scheduledNotification)
         {
             Logger.LogInformation($"{nameof(JobService)} - {nameof(ProcessAcctionList)}");
-            var users = await DashboardService.GetOpenProcessesPerTemplate(scheduledNotification.NotificationTemplate);
+            var users = await ProcessService.GetOpenProcessesPerTemplate(scheduledNotification.NotificationTemplate);
             foreach (var user in users)
             {
                 if (string.IsNullOrEmpty(user.UserEmail))

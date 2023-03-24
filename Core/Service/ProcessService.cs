@@ -13,16 +13,16 @@ using System.Data.SqlClient;
 
 namespace Core.Service
 {
-    public class DashboardService : IDashboardService
+    public class ProcessService : IProcessService
     {
         private INotificationService NotificationService;
         private ILookupService LookupService;
         private IConfiguration Configuration;
-        private readonly ILogger<DashboardService> Logger;
+        private readonly ILogger<ProcessService> Logger;
         private IHttpContextAccessor HttpContextAccessor;
         private string UserName;
 
-        public DashboardService(INotificationService notificationService, ILookupService lookupService, IConfiguration configuration, ILogger<DashboardService> logger, IHttpContextAccessor httpContextAccessor)
+        public ProcessService(INotificationService notificationService, ILookupService lookupService, IConfiguration configuration, ILogger<ProcessService> logger, IHttpContextAccessor httpContextAccessor)
         {
             NotificationService = notificationService;
             LookupService = lookupService;
@@ -34,7 +34,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<DashUser>> GetUsers()
         {
-            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetUsers)}");
+            Logger.LogInformation($"{UserName} - {nameof(ProcessService)} - {nameof(GetUsers)}");
             var processes = await GetProcessesFromDb();
             var grouped = GroupByUser(processes);
             var distinctUsers = grouped.Select(x => x.UserId).Distinct();
@@ -44,7 +44,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<DashUser>> GetProcessItemsByProcessCode(string processCode)
         {
-            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetProcessItemsByProcessCode)} {processCode}");
+            Logger.LogInformation($"{UserName} - {nameof(ProcessService)} - {nameof(GetProcessItemsByProcessCode)} {processCode}");
             var processes = await GetProcessItemsByProcessCodeFromDb(processCode);
             var grouped = GroupByUser(processes);
             var distinctUsers = grouped.Select(x => x.UserId).Distinct();
@@ -54,7 +54,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<DashProcess>> GetProcesses()
         {
-            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetProcesses)}");
+            Logger.LogInformation($"{UserName} - {nameof(ProcessService)} - {nameof(GetProcesses)}");
             var processes = await GetProcessesFromDb();
             var grouped = GroupByProcess(processes);
             var distinctUsers = processes.Select(x => x.UserId).Distinct();
@@ -70,7 +70,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<DashProcess>> GetProcessesByUser(Guid userId)
         {
-            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetProcessesByUser)} {userId}");
+            Logger.LogInformation($"{UserName} - {nameof(ProcessService)} - {nameof(GetProcessesByUser)} {userId}");
             var processes = await GetProcessesByUserFromDb(userId);
             var grouped = GroupByProcess(processes);
             var distinctUsers = processes.Select(x => x.UserId).Distinct();
@@ -86,7 +86,7 @@ namespace Core.Service
 
         public async Task<IEnumerable<ProcessResult>> GetOpenProcessesPerTemplate(int templateId)
         {
-            Logger.LogInformation($"{UserName}  -  {nameof(DashboardService)}  -  {nameof(GetOpenProcessesPerTemplate)}");
+            Logger.LogInformation($"{UserName}  -  {nameof(ProcessService)}  -  {nameof(GetOpenProcessesPerTemplate)}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -99,7 +99,7 @@ namespace Core.Service
 
         public async Task<ProcessResult> GetProcessInfoByProcId(Guid processId)
         {
-            Logger.LogInformation($"{UserName} - {nameof(DashboardService)} - {nameof(GetProcessInfoByProcId)} {processId}");
+            Logger.LogInformation($"{UserName} - {nameof(ProcessService)} - {nameof(GetProcessInfoByProcId)} {processId}");
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();
             var dparam = new DynamicParameters();
@@ -108,52 +108,6 @@ namespace Core.Service
                 ProcessId=processId,
             });
             return await connection.QueryFirstOrDefaultAsync<ProcessResult>("ed.GetProcessInfoByProcId", param: dparam, commandType: CommandType.StoredProcedure);
-        }
-
-        public async Task<string> CancelProcess(string processCode, Guid procItemId)
-        {
-            Logger.LogInformation($"{UserName} - {nameof(ReassignService)} - {nameof(CancelProcess)} {processCode} {procItemId}");
-            var builder = new TransactionServiceBuilder(Configuration);
-            var info = await GetProcessInfoByProcId(procItemId);
-            var messageHistory = new MessageHistory
-            {
-                EventType = 1,
-                IsManual = true,
-                IsReassign = true,
-                IsCancelProcess = true,
-                IsSystem = false,
-                ProcessCode = processCode,
-                ProcessDescription = info.ProcessDescription,
-                ProcItemId = procItemId,
-                LastAccessTime = info.LastUpdated,
-                TriggeredBy = await LookupService.GetUserIdByNetworkAlias(UserName),
-                UserId = info.UserId
-            };
-            await NotificationService.AddNotificationHistory(messageHistory);
-            return await builder.CancelProcess(processCode, procItemId);
-        }
-
-        public async Task<string> CancelProcesses(Cancel model)
-        {
-            Logger.LogInformation($"{UserName} - {nameof(ReassignService)} - {nameof(CancelProcesses)} {model.ProcessCode} {model.ProcItemId}");
-            if (model.ProcessCode != null)
-            {
-                var processItems = await GetProcessItemsByProcessCode(model.ProcessCode);
-                foreach (var processItem in processItems)
-                {
-                    await CancelProcess(model.ProcessCode, processItem.ProcessItemId);
-                }
-            }
-
-            if (model.UserId != Guid.Empty)
-            {
-                var processes = await GetProcessesByUser(model.UserId);
-                foreach (var process in processes)
-                {
-                    await CancelProcess(process.ProcessCode, process.ProcessItemId);
-                }
-            }
-            return string.Empty;
         }
 
         private async Task<IEnumerable<ProcessResult>> GetProcessesFromDb()

@@ -11,17 +11,17 @@ namespace Core.Service
     {
         private IConfiguration Configuration;
         INotificationService NotificationService;
-        IDashboardService DashboardService;
+        IProcessService ProcessService;
         ILookupService LookupService;
         private readonly ILogger<ReassignService> Logger;
         private IHttpContextAccessor HttpContextAccessor;
         private string UserName;
 
-        public ReassignService(IConfiguration configuration, INotificationService notificationService, IDashboardService dashboardService, ILookupService lookupService, ILogger<ReassignService> logger, IHttpContextAccessor httpContextAccessor)
+        public ReassignService(IConfiguration configuration, INotificationService notificationService, IProcessService processService, ILookupService lookupService, ILogger<ReassignService> logger, IHttpContextAccessor httpContextAccessor)
         {
             Configuration= configuration;
             NotificationService= notificationService;
-            DashboardService= dashboardService;
+            ProcessService = processService;
             LookupService= lookupService;
             Logger= logger;
             HttpContextAccessor= httpContextAccessor;
@@ -32,7 +32,8 @@ namespace Core.Service
         {
             Logger.LogInformation($"{UserName} - {nameof(ReassignService)} - {nameof(Reassign)} {processCode} {procItemId} {reassignToUserId}");
             var builder = new TransactionServiceBuilder(Configuration);
-            var info = await DashboardService.GetProcessInfoByProcId(procItemId);
+            var info = await ProcessService.GetProcessInfoByProcId(procItemId);
+            if (info is null) throw new System.Exception("Process already complete");
             var messageHistory = new MessageHistory
             {
                 EventType = 1,
@@ -55,7 +56,7 @@ namespace Core.Service
         {
             if (model.ProcessCode != null) 
             {
-                var processItems = await DashboardService.GetProcessItemsByProcessCode(model.ProcessCode);
+                var processItems = await ProcessService.GetProcessItemsByProcessCode(model.ProcessCode);
                 foreach ( var processItem in processItems ) 
                 {
                     await Reassign(model.ProcessCode, processItem.ProcessItemId, model.ReassignToUserId);
@@ -64,7 +65,7 @@ namespace Core.Service
 
             if (model.InitialUserId != Guid.Empty)
             {
-                var processes = await DashboardService.GetProcessesByUser(model.InitialUserId);
+                var processes = await ProcessService.GetProcessesByUser(model.InitialUserId);
                 foreach (var process in processes)
                 {
                     await Reassign(process.ProcessCode, process.ProcessItemId, model.ReassignToUserId);

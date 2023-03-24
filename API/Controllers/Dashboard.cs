@@ -13,12 +13,14 @@ namespace API.Controllers
     [EnableCors("_myAllowSpecificOrigins")]
     public class Dashboard : BaseController
     {
-        private IDashboardService ProcessService { get; set; }
+        private IProcessService ProcessService { get; set; }
+        private ICancelService CancelService { get; set; }
         private readonly ILogger<Dashboard> Logger;
 
-        public Dashboard(IDashboardService processService, IHttpContextAccessor httpContextAccessor, ILookupService lookupService, ILogger<Dashboard> logger):base(lookupService, httpContextAccessor)
+        public Dashboard(IProcessService processService, ICancelService cancelService, IHttpContextAccessor httpContextAccessor, ILookupService lookupService, ILogger<Dashboard> logger):base(lookupService, httpContextAccessor)
         {
             ProcessService = processService;
+            CancelService = cancelService;
             Logger = logger;
         }
 
@@ -37,14 +39,14 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Cancel([FromBody] Cancel model)
         {
-            await ProcessService.CancelProcess(model.ProcessCode, model.ProcItemId);
+            await CancelService.CancelProcess(model.ProcessCode, model.ProcItemId);
             return Ok();
         }
 
         [HttpPost]
         public async Task<IActionResult> CancelAll([FromBody] Cancel model)
         {
-            await ProcessService.CancelProcesses(model);
+            await CancelService.CancelAll(model);
             return Ok();
         }
     }
