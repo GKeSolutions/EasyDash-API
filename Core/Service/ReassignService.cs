@@ -56,7 +56,7 @@ namespace Core.Service
         {
             if (model.ProcessCode != null) 
             {
-                var processItems = await ProcessService.GetProcessItemsByProcessCode(model.ProcessCode);
+                var processItems = await ProcessService.GetProcessItemsByProcessCodeFromDb(model.ProcessCode);
                 foreach ( var processItem in processItems ) 
                 {
                     await Reassign(model.ProcessCode, processItem.ProcessItemId, model.ReassignToUserId);
@@ -65,7 +65,7 @@ namespace Core.Service
 
             if (model.InitialUserId != Guid.Empty)
             {
-                var processes = await ProcessService.GetProcessesByUser(model.InitialUserId);
+                var processes = await ProcessService.GetProcessesByUserFromDb(model.InitialUserId);
                 foreach (var process in processes)
                 {
                     await Reassign(process.ProcessCode, process.ProcessItemId, model.ReassignToUserId);
