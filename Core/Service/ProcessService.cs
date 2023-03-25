@@ -117,7 +117,7 @@ namespace Core.Service
             return await connection.QueryAsync<ProcessResult>("ed.GetProcesses");
         }
 
-        private async Task<IEnumerable<ProcessResult>> GetProcessesByUserFromDb(Guid userId)
+        public async Task<IEnumerable<ProcessResult>> GetProcessesByUserFromDb(Guid userId)
         {
             using var connection = new SqlConnection(Configuration["ConnectionStrings:local"]);
             connection.Open();

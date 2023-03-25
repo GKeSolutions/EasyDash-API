@@ -1,5 +1,4 @@
-﻿using Core.Model.Dashboard;
-using Core.Model.Dashboard.Process;
+﻿using Core.Model.Dashboard.Process;
 using Core.Model.Dashboard.User;
 
 namespace Core.Interface
@@ -11,6 +10,7 @@ namespace Core.Interface
         Task<IEnumerable<DashProcess>> GetProcessesByUser(Guid userId);
         Task<IEnumerable<DashUser>> GetProcessItemsByProcessCode(string processCode);
         Task<IEnumerable<ProcessResult>> GetProcessItemsByProcessCodeFromDb(string processCode);
+        Task<IEnumerable<ProcessResult>> GetProcessesByUserFromDb(Guid userId);
         Task<IEnumerable<ProcessResult>> GetOpenProcessesPerTemplate(int templateId);
         Task<ProcessResult> GetProcessInfoByProcId(Guid processId);
     }

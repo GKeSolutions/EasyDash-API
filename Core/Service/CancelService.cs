@@ -57,16 +57,16 @@ namespace Core.Service
             Logger.LogInformation($"{UserName} - {nameof(CancelService)} - {nameof(CancelAll)} {model.ProcessCode} {model.ProcItemId}");
             if (model.ProcessCode != null)
             {
-                var processItems = await ProcessService.GetProcessItemsByProcessCode(model.ProcessCode);
+                var processItems = await ProcessService.GetProcessItemsByProcessCodeFromDb(model.ProcessCode);
                 foreach (var processItem in processItems)
                 {
                     await CancelProcess(model.ProcessCode, processItem.ProcessItemId);
                 }
             }
 
-            if (model.UserId != Guid.Empty)
+            else if (model.UserId != Guid.Empty)
             {
-                var processes = await ProcessService.GetProcessesByUser(model.UserId);
+                var processes = await ProcessService.GetProcessesByUserFromDb(model.UserId);
                 foreach (var process in processes)
                 {
                     await CancelProcess(process.ProcessCode, process.ProcessItemId);

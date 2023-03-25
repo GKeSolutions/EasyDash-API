@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using System.ServiceModel;
 using System.Text;
-using TransactionService;
 
 namespace Core
 {
