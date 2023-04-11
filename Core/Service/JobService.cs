@@ -79,7 +79,7 @@ namespace Core.Service
                 if (scheduledNotification.ReassignTo != Guid.Empty)
                 {
                     Logger.LogInformation($"{nameof(JobService)} - {nameof(ProcessAcctionList)} - Reassiging Process {user.ProcessItemId} with process code {user.ProcessCode} to user {scheduledNotification.ReassignTo}");
-                    await ReassignService.Reassign(user.ProcessCode, user.ProcessItemId, scheduledNotification.ReassignTo, true);
+                    await ReassignService.Reassign(user.ProcessCode, user.ProcessItemId, scheduledNotification.ReassignTo.Value, true);
                 }
             }
 
