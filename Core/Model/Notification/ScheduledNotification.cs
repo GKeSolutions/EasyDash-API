@@ -9,7 +9,7 @@
         public int Scheduler { get; set; }
         public int? NotifyAfterDays { get; set; }
         public int EventType { get; set; }
-        public Guid ReassignTo { get; set; }
+        public Guid? ReassignTo { get; set; }
         public string CcContact { get; set; }
         public bool IsCancelProcess { get; set; }
     }
